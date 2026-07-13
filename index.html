@@ -382,6 +382,131 @@
       padding-top: 10px;
     }
 
+    /* Personal Best chip on exercise cards */
+    .ex-pb {
+      margin-top: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+    }
+    .ex-pb-val {
+      color: var(--accent);
+      font-weight: 700;
+      background: #1a1f0a;
+      border: 1px solid #3a4a10;
+      border-radius: 6px;
+      padding: 1px 7px;
+    }
+    .ex-pb-date { color: var(--muted); }
+    .ex-pb-add {
+      color: var(--muted);
+      border: 1px dashed #3a3a3a;
+      border-radius: 6px;
+      padding: 1px 7px;
+    }
+    .ex-pb:hover .ex-pb-add { color: var(--accent); border-color: var(--accent); }
+
+    /* Personal Bests page */
+    .pb-intro {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .pb-list { display: flex; flex-direction: column; gap: 8px; }
+    .pb-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .pb-card:hover { border-color: #444; }
+    .pb-name { font-weight: 600; font-size: 15px; }
+    .pb-updated { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .pb-updated.none { opacity: 0.7; }
+    .pb-value {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--accent);
+      white-space: nowrap;
+      text-align: right;
+    }
+    .pb-add { color: var(--muted); font-weight: 600; font-size: 13px; }
+
+    /* PB edit modal */
+    .pb-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .pb-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .pb-modal-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .pb-modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .pb-modal-fields { display: flex; gap: 10px; margin-bottom: 18px; }
+    .pb-modal-fields label {
+      flex: 1;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .pb-modal-fields input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      padding: 10px 6px;
+      text-align: center;
+      width: 100%;
+      -moz-appearance: textfield;
+    }
+    .pb-modal-fields input::-webkit-outer-spin-button,
+    .pb-modal-fields input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .pb-modal-fields input:focus { outline: none; border-color: var(--accent); }
+    .pb-modal-actions { display: flex; gap: 10px; }
+    .pb-modal-actions button {
+      flex: 1;
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border);
+    }
+    .pb-btn-cancel { background: transparent; color: var(--muted); }
+    .pb-btn-save { background: var(--accent); color: #0f0f0f; border-color: var(--accent); }
+    .pb-modal-clear { text-align: center; margin-top: 14px; }
+    .pb-modal-clear button {
+      background: none; border: none; color: var(--red);
+      font-size: 12px; cursor: pointer;
+    }
+
     @media (max-width: 400px) {
       .day-title { font-size: 20px; }
       body { padding: 12px; }
@@ -391,6 +516,23 @@
 <body>
 
 <div id="app"></div>
+
+<div id="pb-modal" class="pb-modal-overlay" style="display:none" onclick="pbModalBackdrop(event)">
+  <div class="pb-modal">
+    <div class="pb-modal-title" id="pb-modal-name"></div>
+    <div class="pb-modal-sub">Log your heaviest set. It carries over each week until you change it.</div>
+    <div class="pb-modal-fields">
+      <label>Weight (lbs)<input id="pb-weight" type="number" inputmode="decimal" step="0.5" min="0"></label>
+      <label>Sets<input id="pb-sets" type="number" inputmode="numeric" step="1" min="0"></label>
+      <label>Reps<input id="pb-reps" type="number" inputmode="numeric" step="1" min="0"></label>
+    </div>
+    <div class="pb-modal-actions">
+      <button class="pb-btn-cancel" onclick="closePBEditor()">Cancel</button>
+      <button class="pb-btn-save" onclick="savePBFromModal()">Save</button>
+    </div>
+    <div class="pb-modal-clear"><button onclick="clearPBFromModal()">Clear this PB</button></div>
+  </div>
+</div>
 
 <script>
 const PROGRAM_START = new Date('2026-03-11');
@@ -508,6 +650,123 @@ const DATA = {
 
 const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
 
+/* ---------- Personal Bests (stored in this browser) ---------- */
+const PB_KEY = 'gym_pbs_v1';
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function loadPBs() {
+  try { return JSON.parse(localStorage.getItem(PB_KEY)) || {}; }
+  catch (e) { return {}; }
+}
+function savePBs(obj) {
+  localStorage.setItem(PB_KEY, JSON.stringify(obj));
+}
+function getPB(name) { return loadPBs()[name] || null; }
+function setPB(name, data) {
+  const all = loadPBs();
+  all[name] = data;
+  savePBs(all);
+}
+function removePB(name) {
+  const all = loadPBs();
+  delete all[name];
+  savePBs(all);
+}
+
+function localDateStr(d) {
+  d = d || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function formatPBDate(str) {
+  if (!str) return '';
+  const d = new Date(str + 'T00:00:00');
+  return `${MONTH_SHORT[d.getMonth()]} ${d.getDate()}`;
+}
+
+// Unique list of every named exercise across the whole schedule, in order.
+function allExercises() {
+  const seen = new Set();
+  const list = [];
+  DAYS.forEach(dn => {
+    const day = DATA.schedule[dn];
+    if (day && day.exercises) {
+      day.exercises.forEach(ex => {
+        if (!seen.has(ex.name)) { seen.add(ex.name); list.push(ex.name); }
+      });
+    }
+  });
+  return list;
+}
+
+function pbSummary(pb) {
+  if (!pb) return null;
+  const parts = [];
+  if (pb.weight != null) parts.push(pb.weight + ' lbs');
+  if (pb.sets != null && pb.reps != null) parts.push(pb.sets + '×' + pb.reps);
+  else if (pb.reps != null) parts.push(pb.reps + ' reps');
+  else if (pb.sets != null) parts.push(pb.sets + ' sets');
+  return parts.length ? parts.join(' · ') : null;
+}
+
+// Escape a value for safe inclusion inside a single-quoted JS string in an attribute.
+function jsStr(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+function pbChipHtml(name) {
+  const pb = getPB(name);
+  const str = pbSummary(pb);
+  if (str) {
+    return `<div class="ex-pb" onclick="openPBEditor('${jsStr(name)}')">
+      <span class="ex-pb-val">PB ${str}</span>
+      ${pb.updated ? `<span class="ex-pb-date">· ${formatPBDate(pb.updated)}</span>` : ''}
+    </div>`;
+  }
+  return `<div class="ex-pb" onclick="openPBEditor('${jsStr(name)}')">
+    <span class="ex-pb-add">+ Log PB</span>
+  </div>`;
+}
+
+/* ---------- PB edit modal ---------- */
+let _editingPB = null;
+
+function openPBEditor(name) {
+  _editingPB = name;
+  const pb = getPB(name) || {};
+  document.getElementById('pb-modal-name').textContent = name;
+  document.getElementById('pb-weight').value = pb.weight != null ? pb.weight : '';
+  document.getElementById('pb-sets').value = pb.sets != null ? pb.sets : '';
+  document.getElementById('pb-reps').value = pb.reps != null ? pb.reps : '';
+  document.getElementById('pb-modal').style.display = 'flex';
+}
+function closePBEditor() {
+  document.getElementById('pb-modal').style.display = 'none';
+  _editingPB = null;
+}
+function pbModalBackdrop(e) {
+  if (e.target.id === 'pb-modal') closePBEditor();
+}
+function readNum(id) {
+  const v = document.getElementById(id).value.trim();
+  return v === '' ? null : Number(v);
+}
+function savePBFromModal() {
+  if (_editingPB == null) return;
+  const weight = readNum('pb-weight');
+  const sets = readNum('pb-sets');
+  const reps = readNum('pb-reps');
+  if (weight == null && sets == null && reps == null) { closePBEditor(); return; }
+  setPB(_editingPB, { weight, sets, reps, updated: localDateStr() });
+  closePBEditor();
+  _rerender();
+}
+function clearPBFromModal() {
+  if (_editingPB != null) removePB(_editingPB);
+  closePBEditor();
+  _rerender();
+}
+
 function formatTime(d) {
   let h = d.getHours(), m = d.getMinutes();
   const ampm = h >= 12 ? 'PM' : 'AM';
@@ -564,6 +823,7 @@ function renderWorkout(day, dayData, showClock = true) {
         <div class="ex-body">
           <div class="ex-name">${ex.name}</div>
           <div class="ex-cue">${ex.cue}</div>
+          ${pbChipHtml(ex.name)}
         </div>
         <div class="ex-meta">
           <div class="ex-sets">${ex.sets} x ${ex.reps}</div>
@@ -777,17 +1037,53 @@ function renderDayView(dayName, dateLabel) {
   return html;
 }
 
+function renderPBs() {
+  let html = `<div class="nav">
+    <button class="nav-btn back" onclick="showToday()">&#8592; Today</button>
+    <button class="nav-btn" onclick="showWeek()" style="margin-left:auto">Week</button>
+  </div>
+  <div class="header">
+    <div>
+      <div class="day-label">Personal Bests</div>
+      <div class="day-title"><span>Heaviest Lifts</span></div>
+    </div>
+  </div>
+  <div class="pb-intro">Tap any lift to log your heaviest set — weight, sets & reps. Each entry sticks and carries over week to week until you update it.</div>
+  <div class="pb-list">`;
+
+  allExercises().forEach(name => {
+    const pb = getPB(name);
+    const str = pbSummary(pb);
+    html += `<div class="pb-card" onclick="openPBEditor('${jsStr(name)}')">
+      <div class="pb-card-body">
+        <div class="pb-name">${name}</div>
+        ${str
+          ? `<div class="pb-updated">Updated ${formatPBDate(pb.updated)}</div>`
+          : `<div class="pb-updated none">Not logged yet</div>`}
+      </div>
+      <div class="pb-value">${str ? str : '<span class="pb-add">+ Add</span>'}</div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  return html;
+}
+
 let _todayDate = new Date();
 let _todayName = '';
+let _rerender = showToday;
 
 function showToday() {
+  _rerender = showToday;
   document.getElementById('app').innerHTML =
     `<div class="nav" style="justify-content:flex-end">
+      <button class="nav-btn" onclick="showPBs()">PBs</button>
       <button class="nav-btn" onclick="showWeek()">Week</button>
     </div>` + renderWorkout(_todayName, DATA.schedule[_todayName]);
 }
 
 function showWeek() {
+  _rerender = showWeek;
   document.getElementById('app').innerHTML = renderWeek(_todayDate);
   // Scroll today into view
   const todayCard = document.querySelector('.week-card.today');
@@ -795,11 +1091,18 @@ function showWeek() {
 }
 
 function showDay(dayName, dateLabel) {
+  _rerender = () => showDay(dayName, dateLabel);
   document.getElementById('app').innerHTML = renderDayView(dayName, dateLabel);
 }
 
 function showHistory(key) {
+  _rerender = () => showHistory(key);
   document.getElementById('app').innerHTML = renderHistoryView(key);
+}
+
+function showPBs() {
+  _rerender = showPBs;
+  document.getElementById('app').innerHTML = renderPBs();
 }
 
 function init() {
