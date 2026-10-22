@@ -12,10 +12,10 @@
       --surface: #1a1a1a;
       --border: #2a2a2a;
       --accent: #c8ff00;
+      --accent-bg: #1a1f0a;
       --text: #f0f0f0;
       --muted: #888;
-      --red: #ff4444;
-      --blue: #4a9eff;
+      --dim: #555;
       --green: #44cc88;
     }
 
@@ -24,492 +24,173 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.4;
       padding: 16px;
       max-width: 600px;
       margin: 0 auto;
     }
+    button { font: inherit; cursor: pointer; }
+    input[type=number] { -moz-appearance: textfield; }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    /* Header */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .day-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    .day-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-    }
-    .day-title span {
-      color: var(--accent);
-    }
-    .date-box {
-      text-align: right;
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .date-box .time {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    /* Progression banner */
-    .progression {
-      background: #1a1f0a;
-      border: 1px solid #3a4a10;
-      border-left: 3px solid var(--accent);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #c8e855;
-      margin-bottom: 20px;
-    }
-    .progression strong { color: var(--accent); }
-
-    /* Section */
-    .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    /* Exercise cards */
-    .exercises { margin-bottom: 24px; }
-    .exercise-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 13px 15px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .ex-num {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent);
-      min-width: 18px;
-    }
-    .ex-body { flex: 1; }
-    .ex-name {
-      font-weight: 600;
-      font-size: 15px;
-    }
-    .ex-cue {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .ex-meta {
-      text-align: right;
-      white-space: nowrap;
-    }
-    .ex-sets {
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--accent);
-    }
-    .ex-reps {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* Activity cards (rest/recovery days) */
-    .activity-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 13px 15px;
-      margin-bottom: 8px;
-    }
-    .activity-task {
-      font-weight: 600;
-      font-size: 15px;
-    }
-    .activity-benefit {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    /* Nutrition */
-    .nutrition { margin-bottom: 24px; }
-    .meal-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 13px 15px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .meal-body { flex: 1; }
-    .meal-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 2px;
-    }
-    .meal-desc {
-      font-weight: 500;
-      font-size: 14px;
-    }
-    .meal-note {
-      font-size: 11px;
-      color: #888;
-      font-style: italic;
-      margin-top: 2px;
-    }
-    .meal-protein {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--green);
-      white-space: nowrap;
-    }
-
-
-/* Nutrition rules */
-    .rules {
-      margin-top: 10px;
-    }
-    .rule {
-      display: flex;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 4px 0;
-      border-top: 1px solid var(--border);
-    }
-    .rule:first-child { border-top: none; }
-    .rule::before { content: "—"; color: #444; flex-shrink: 0; }
-
-    /* Supplements */
-    .supplements { margin-bottom: 24px; }
-    .supp-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 13px 15px;
-      margin-bottom: 8px;
-    }
-    .supp-timing {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--blue);
-      margin-bottom: 2px;
-    }
-    .supp-desc {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    /* Rest day header */
-    .rest-header {
-      text-align: center;
-      padding: 24px 0 16px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .rest-header .rest-icon {
-      font-size: 40px;
-      display: block;
-      margin-bottom: 8px;
-    }
-    .rest-header .rest-text {
-      font-size: 15px;
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    /* Water */
-    .water-bar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 15px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
-    }
-    .water-bar .label { color: var(--muted); }
-    .water-bar .val { font-weight: 700; color: var(--blue); font-size: 16px; }
-
-    /* Nav bar */
-    .nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-    .nav-btn {
+    /* Tabs */
+    .tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+    .tab {
+      flex: 1;
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--muted);
       border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      transition: border-color 0.15s, color 0.15s;
-    }
-    .nav-btn:hover { border-color: #444; color: var(--text); }
-    .nav-btn.active { border-color: var(--accent); color: var(--accent); background: #1a1f0a; }
-    .nav-btn.back { border-color: #444; color: var(--text); }
-
-    /* Week overview / timeline */
-    .week-grid { display: flex; flex-direction: column; gap: 6px; }
-    .week-section-label {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #444;
-      padding: 8px 2px 2px;
-    }
-    .week-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 14px;
-      cursor: pointer;
-      transition: border-color 0.15s;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .week-card:hover { border-color: #444; }
-    .week-card.today { border-color: var(--accent); background: #131a02; }
-    .week-card.past { opacity: 0.65; }
-    .week-card.past:hover { opacity: 1; }
-    .week-card.pre-program { opacity: 0.3; cursor: default; }
-    .week-date-col {
-      min-width: 52px;
-      text-align: center;
-      padding-top: 1px;
-    }
-    .week-date-num {
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--text);
-    }
-    .week-card.today .week-date-num { color: var(--accent); }
-    .week-date-month {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-top: 1px;
-    }
-    .week-card-body { flex: 1; }
-    .week-day-name {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 2px;
-    }
-    .week-card.today .week-day-name { color: var(--accent); }
-    .week-workout-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 3px;
-    }
-    .week-detail {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .week-tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 2px 7px;
-      border-radius: 10px;
-      margin-top: 4px;
-    }
-    .week-tag.workout { background: #1a2a05; color: var(--accent); }
-    .week-tag.recovery { background: #0a1a2a; color: var(--blue); }
-    .week-tag.rest { background: #0a1a2a; color: var(--blue); }
-    .week-tag.history { background: #1a1218; color: #c88; }
-
-    /* History detail view */
-    .history-card {
-      background: var(--surface);
-      border: 1px solid #3a2a2a;
-      border-left: 3px solid #c88;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .history-date { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
-    .history-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-    .history-summary { font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
-    .history-note {
-      font-size: 12px;
-      color: var(--muted);
-      font-style: italic;
-      border-top: 1px solid var(--border);
-      padding-top: 10px;
-    }
-
-    /* Personal Best chip on exercise cards */
-    .ex-pb {
-      margin-top: 6px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-    }
-    .ex-pb-val {
-      color: var(--accent);
-      font-weight: 700;
-      background: #1a1f0a;
-      border: 1px solid #3a4a10;
-      border-radius: 6px;
-      padding: 1px 7px;
-    }
-    .ex-pb-date { color: var(--muted); }
-    .ex-pb-add {
-      color: var(--muted);
-      border: 1px dashed #3a3a3a;
-      border-radius: 6px;
-      padding: 1px 7px;
-    }
-    .ex-pb:hover .ex-pb-add { color: var(--accent); border-color: var(--accent); }
-
-    /* Personal Bests page */
-    .pb-intro {
+      padding: 6px 0;
       font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 18px;
+      font-weight: 600;
     }
-    .pb-list { display: flex; flex-direction: column; gap: 8px; }
-    .pb-card {
+    .tab.active { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+    /* Header */
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .title { font-size: 24px; font-weight: 700; color: var(--accent); margin: 2px 0 16px; }
+    .section { margin-bottom: 22px; }
+    .section > .label { margin-bottom: 8px; }
+
+    /* Cards */
+    .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 13px 15px;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+    }
+    .row { display: flex; align-items: center; gap: 12px; }
+    .grow { flex: 1; min-width: 0; }
+    .name { font-weight: 600; }
+    .sub { font-size: 12px; color: var(--muted); }
+
+    /* Weight input */
+    .wt {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      cursor: pointer;
-      transition: border-color 0.15s;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding-right: 8px;
     }
-    .pb-card:hover { border-color: #444; }
-    .pb-name { font-weight: 600; font-size: 15px; }
-    .pb-updated { font-size: 11px; color: var(--muted); margin-top: 3px; }
-    .pb-updated.none { opacity: 0.7; }
-    .pb-value {
+    .wt:focus-within { border-color: var(--accent); }
+    .wt input {
+      width: 58px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 17px;
       font-weight: 700;
-      font-size: 15px;
-      color: var(--accent);
-      white-space: nowrap;
+      padding: 7px 4px 7px 8px;
       text-align: right;
     }
-    .pb-add { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .wt input:focus { outline: none; }
+    .wt input::placeholder { color: var(--dim); font-weight: 500; }
+    .wt span { font-size: 11px; color: var(--muted); }
 
-    /* PB edit modal */
-    .pb-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.72);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 100;
-    }
-    .pb-modal {
-      background: var(--surface);
+    /* Protein */
+    .protein-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+    .protein-num { font-size: 28px; font-weight: 700; color: var(--green); }
+    .protein-num small { font-size: 14px; color: var(--muted); font-weight: 500; }
+    .bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .bar div { height: 100%; background: var(--green); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip {
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      width: 100%;
-      max-width: 360px;
+      color: var(--text);
+      border-radius: 16px;
+      padding: 5px 11px;
+      font-size: 13px;
     }
-    .pb-modal-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-    .pb-modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-    .pb-modal-fields { display: flex; gap: 10px; margin-bottom: 18px; }
-    .pb-modal-fields label {
+    .chip b { color: var(--green); }
+    .chip:active { border-color: var(--green); }
+    .protein-edit { display: flex; gap: 6px; margin-top: 10px; }
+    .protein-edit input {
       flex: 1;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .pb-modal-fields input {
+      min-width: 0;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text);
-      font-size: 18px;
-      font-weight: 700;
-      padding: 10px 6px;
-      text-align: center;
-      width: 100%;
-      -moz-appearance: textfield;
+      font-size: 15px;
+      padding: 7px 10px;
     }
-    .pb-modal-fields input::-webkit-outer-spin-button,
-    .pb-modal-fields input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .pb-modal-fields input:focus { outline: none; border-color: var(--accent); }
-    .pb-modal-actions { display: flex; gap: 10px; }
-    .pb-modal-actions button {
-      flex: 1;
+    .protein-edit input:focus { outline: none; border-color: var(--green); }
+    .protein-edit button {
+      background: var(--green);
+      color: #0f0f0f;
+      border: none;
       border-radius: 8px;
-      padding: 11px;
-      font-size: 14px;
+      padding: 0 14px;
       font-weight: 700;
-      cursor: pointer;
-      border: 1px solid var(--border);
-    }
-    .pb-btn-cancel { background: transparent; color: var(--muted); }
-    .pb-btn-save { background: var(--accent); color: #0f0f0f; border-color: var(--accent); }
-    .pb-modal-clear { text-align: center; margin-top: 14px; }
-    .pb-modal-clear button {
-      background: none; border: none; color: var(--red);
-      font-size: 12px; cursor: pointer;
     }
 
+    /* Week + month headers */
+    .pager { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .pager button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      width: 36px;
+      height: 32px;
+    }
+    .pager .label { color: var(--text); font-size: 13px; }
+
+    .day-row { cursor: pointer; }
+    .day-row.today { border-color: var(--accent); }
+    .day-date { width: 40px; text-align: center; }
+    .day-date b { display: block; font-size: 17px; }
+    .day-row.today .day-date b { color: var(--accent); }
+    .day-protein { width: 64px; text-align: right; font-size: 13px; font-weight: 700; }
+    .day-protein .bar { margin-top: 4px; height: 4px; }
+    .hit { color: var(--green); }
+
+    .stats { display: flex; gap: 6px; margin-bottom: 6px; }
+    .stat { flex: 1; text-align: center; }
+    .stat b { display: block; font-size: 20px; }
+
+    /* Month calendar */
+    .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal .dow { text-align: center; font-size: 10px; color: var(--dim); font-weight: 700; }
+    .cal .cell {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 2px;
+      text-align: center;
+      min-height: 42px;
+      cursor: pointer;
+    }
+    .cal .cell .d { font-size: 10px; color: var(--muted); }
+    .cal .cell .g { font-size: 13px; font-weight: 700; }
+    .cal .cell.hit { background: #0e2419; border-color: #1f5a3c; }
+    .cal .cell.today { border-color: var(--accent); }
+    .cal .blank { visibility: hidden; }
+
+    /* Lift history table */
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { padding: 6px 4px; text-align: right; white-space: nowrap; }
+    th { font-size: 10px; color: var(--muted); font-weight: 700; }
+    td:first-child, th:first-child { text-align: left; white-space: normal; padding-left: 0; }
+    tr + tr td { border-top: 1px solid var(--border); }
+    td.empty { color: var(--dim); }
+    td.cur { color: var(--accent); font-weight: 700; }
+
     @media (max-width: 400px) {
-      .day-title { font-size: 20px; }
       body { padding: 12px; }
+      .title { font-size: 21px; }
     }
   </style>
 </head>
@@ -517,607 +198,333 @@
 
 <div id="app"></div>
 
-<div id="pb-modal" class="pb-modal-overlay" style="display:none" onclick="pbModalBackdrop(event)">
-  <div class="pb-modal">
-    <div class="pb-modal-title" id="pb-modal-name"></div>
-    <div class="pb-modal-sub">Log your heaviest set. It carries over each week until you change it.</div>
-    <div class="pb-modal-fields">
-      <label>Weight (lbs)<input id="pb-weight" type="number" inputmode="decimal" step="0.5" min="0"></label>
-      <label>Sets<input id="pb-sets" type="number" inputmode="numeric" step="1" min="0"></label>
-      <label>Reps<input id="pb-reps" type="number" inputmode="numeric" step="1" min="0"></label>
-    </div>
-    <div class="pb-modal-actions">
-      <button class="pb-btn-cancel" onclick="closePBEditor()">Cancel</button>
-      <button class="pb-btn-save" onclick="savePBFromModal()">Save</button>
-    </div>
-    <div class="pb-modal-clear"><button onclick="clearPBFromModal()">Clear this PB</button></div>
-  </div>
-</div>
-
 <script>
-const PROGRAM_START = new Date('2026-03-11');
+const PROTEIN_GOAL = 170;
 
-const HISTORY = {
-  "2026-03-11": { session_type: "Initial Re-Entry", summary: "First day back after 1-year layoff. Neurological wake-up and foundational movements.", note: "Established 170g protein goal; introduced 11:30 AM breakfast." },
-  "2026-03-12": { session_type: "Neurological Priming", summary: "Light upper body volume to assess joint soreness and recovery capacity.", note: "Standardized the No-Puff carb-backloading strategy." },
-  "2026-03-13": { session_type: "Active Recovery", summary: "Full rest from lifting. 4L hydration to flush initial soreness.", note: "Introduced Factor meal integration rules." },
-  "2026-03-14": { session_type: "Push Day", summary: "Official Massive program start. Incline DB Press + Standing Press.", note: "Working weights: 35-45lbs Incline, 25-35lbs Overhead." },
-  "2026-03-15": { session_type: "Pull Day", summary: "Back and biceps width focus (V-Taper). Rope Hammer Curl flare + Dead Hangs.", note: "Permanent weekly cycle begins from this date." }
+const SCHEDULE = {
+  sunday: { title: "Pull", exercises: [
+    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Failure" },
+    { name: "Lat Pulldowns", sets: 3, reps: "8-10" },
+    { name: "Heavy DB Rows", sets: 3, reps: "8-10" },
+    { name: "Face Pulls", sets: 3, reps: 15 },
+    { name: "Rope Hammer Curls", sets: 3, reps: "12-15" },
+    { name: "Incline DB Curls", sets: 3, reps: 12 },
+    { name: "Dead Hangs", sets: 2, reps: "Failure" }
+  ]},
+  monday: { title: "Push", exercises: [
+    { name: "Incline DB Press", sets: 4, reps: "8-10" },
+    { name: "Standing DB Press", sets: 3, reps: "8-10" },
+    { name: "Lateral Raises", sets: 4, reps: 15 },
+    { name: "Cable Flyes", sets: 3, reps: "12-15" },
+    { name: "Tricep Rope Pushdowns", sets: 3, reps: "12-15" }
+  ]},
+  tuesday: { title: "Legs", exercises: [
+    { name: "Leg Press", sets: 4, reps: "10-12" },
+    { name: "Leg Extensions", sets: 3, reps: 15 },
+    { name: "Seated Leg Curls", sets: 3, reps: "12-15" },
+    { name: "Standing Calf Raises", sets: 4, reps: "15-20" }
+  ]},
+  wednesday: { title: "Active Recovery", activities: ["30-min brisk walk", "Static stretching"] },
+  thursday: { title: "Upper Pump", exercises: [
+    { name: "DB Flat Press", sets: 3, reps: "12-15" },
+    { name: "Single Arm Rows", sets: 3, reps: "12-15" },
+    { name: "Lateral Raises", sets: 3, reps: 20 },
+    { name: "Cable Curls / Pushdowns", sets: 3, reps: 15 },
+    { name: "Hanging Knee Raises", sets: 3, reps: 15 }
+  ]},
+  friday: { title: "Legs + Core", exercises: [
+    { name: "Dumbbell RDLs", sets: 3, reps: "10-12" },
+    { name: "Goblet Squats", sets: 3, reps: 12 },
+    { name: "Walking Lunges", sets: 2, reps: "10/leg" },
+    { name: "Standing Calf Raises", sets: 3, reps: "15-20" },
+    { name: "Hanging Knee Raises", sets: 3, reps: "12-15" }
+  ]},
+  saturday: { title: "Rest", activities: ["8+ hours sleep", "Pick Factor meals"] }
 };
 
-const DATA = {
-  "split_type": "5-Day Massive Re-Inflation",
-  "rule_of_progression": "Add 5lbs to the 'Big 2' lifts every week or 1-2 reps at current weight.",
-  "schedule": {
-    "sunday": {
-      "title": "Pull",
-      "subtitle": "Width & V-Taper",
-      "type": "workout",
-      "exercises": [
-        { "name": "Pull-ups / Chin-ups", "sets": 3, "reps": "Failure", "cue": "Best lat exercise; chin-ups if pull-ups are too hard; dead stop each rep" },
-        { "name": "Lat Pulldowns", "sets": 3, "reps": "8-10", "cue": "Thumbless grip; pull with elbows; target 80-100lbs" },
-        { "name": "Heavy DB Rows", "sets": 3, "reps": "8-10", "cue": "70-80+ lbs; elbow drives straight back; chest on bench for support; builds back thickness" },
-        { "name": "Face Pulls", "sets": 3, "reps": 15, "cue": "Rope to forehead; pull ends apart for rear delts" },
-        { "name": "Rope Hammer Curls", "sets": 3, "reps": "12-15", "cue": "Neutral grip; flare rope ends outward at peak" },
-        { "name": "Incline DB Curls", "sets": 3, "reps": 12, "cue": "Full bicep stretch at bottom; sit back on bench" },
-        { "name": "Dead Hangs", "sets": 2, "reps": "Failure", "cue": "Posture reset; decompress spine after heavy rows" }
-      ]
-    },
-    "monday": {
-      "title": "Push",
-      "subtitle": "Upper Chest & Shoulder Width",
-      "type": "workout",
-      "exercises": [
-        { "name": "Incline DB Press", "sets": 4, "reps": "8-10", "cue": "45deg Incline; slow stretch; target 35-45lbs" },
-        { "name": "Standing DB Press", "sets": 3, "reps": "8-10", "cue": "Squeeze glutes; standing for posture; target 25-35lbs" },
-        { "name": "Lateral Raises", "sets": 4, "reps": 15, "cue": "Lead with elbows; pinkies up for side delt width" },
-        { "name": "Cable Flyes", "sets": 3, "reps": "12-15", "cue": "1s squeeze at center to etch chest line" },
-        { "name": "Tricep Rope Pushdowns", "sets": 3, "reps": "12-15", "cue": "Elbows bolted to ribs; pull rope apart at bottom" }
-      ]
-    },
-    "tuesday": {
-      "title": "Legs",
-      "subtitle": "Quad Dominant & Growth",
-      "type": "workout",
-      "exercises": [
-        { "name": "Leg Press", "sets": 4, "reps": "10-12", "cue": "Feet shoulder-width; control the descent; target 2-3 plates" },
-        { "name": "Leg Extensions", "sets": 3, "reps": 15, "cue": "2s pause/squeeze at the top for quad definition" },
-        { "name": "Seated Leg Curls", "sets": 3, "reps": "12-15", "cue": "Focus on the burn; slow return to starting position" },
-        { "name": "Standing Calf Raises", "sets": 4, "reps": "15-20", "cue": "Deep stretch at bottom; hold peak for 1s" }
-      ]
-    },
-    "wednesday": {
-      "title": "Active Recovery",
-      "subtitle": "Move & Restore",
-      "type": "recovery",
-      "activities": [
-        { "task": "30-min brisk walk", "benefit": "Inflammation reduction / cardio base" },
-        { "task": "Static Stretching", "benefit": "Hip flexor + hamstring focus" }
-      ]
-    },
-    "thursday": {
-      "title": "Upper Hypertrophy",
-      "subtitle": "The Pump",
-      "type": "workout",
-      "exercises": [
-        { "name": "DB Flat Press", "sets": 3, "reps": "12-15", "cue": "Moderate weight; focus on mind-muscle connection" },
-        { "name": "Single Arm Rows", "sets": 3, "reps": "12-15", "cue": "Drive elbow back; don't rotate the torso" },
-        { "name": "Lateral Raises", "sets": 3, "reps": 20, "cue": "High volume for capped shoulder look" },
-        { "name": "Cable Curls / Pushdowns", "sets": 3, "reps": 15, "cue": "Superset these for maximum arm pump" },
-        { "name": "Hanging Knee Raises", "sets": 3, "reps": 15, "cue": "Slow and controlled; no swinging; squeeze abs at top" }
-      ]
-    },
-    "friday": {
-      "title": "Full Leg + Core",
-      "subtitle": "Posterior Chain",
-      "type": "workout",
-      "exercises": [
-        { "name": "Dumbbell RDLs", "sets": 3, "reps": "10-12", "cue": "Hinge at hips; feel stretch in hamstrings; keep back flat" },
-        { "name": "Goblet Squats", "sets": 3, "reps": 12, "cue": "Hold DB at chest; keep core engaged; deep squat" },
-        { "name": "Walking Lunges", "sets": 2, "reps": "10 per leg", "cue": "Large steps; keep torso upright" },
-        { "name": "Standing Calf Raises", "sets": 3, "reps": "15-20", "cue": "Deep stretch at bottom; hold peak for 1s; calves need 2x frequency" },
-        { "name": "Hanging Knee Raises", "sets": 3, "reps": "12-15", "cue": "Slow and controlled; no swinging; squeeze abs at top" }
-      ]
-    },
-    "saturday": {
-      "title": "Rest",
-      "subtitle": "Total Recovery & Optimization",
-      "type": "rest",
-      "activities": [
-        { "task": "Factor Meal Selection", "benefit": "Locking in 170g protein for the week" },
-        { "task": "8+ Hours Sleep", "benefit": "CNS recovery from 5-day split" }
-      ]
-    }
-  },
-  "nutrition": {
-    "meals": [
-      { "label": "Breakfast", "time": "11:30am", "description": "3 Eggs + 0.5c Egg Whites + 0.5 Avocado", "protein_g": 32, "note": null },
-      { "label": "Post-Workout", "time": null, "description": "2 Scoops Whey + 1.5c White Rice + 5g Creatine", "protein_g": 52, "note": "Workout days only" },
-      { "label": "Meal 3", "time": null, "description": "Factor Protein Plus OR 7oz Chicken + Greens", "protein_g": 48, "note": null },
-      { "label": "Dinner", "time": null, "description": "Factor Keto Beef OR 90/10 Ground Beef + Broccoli", "protein_g": 38, "note": null }
-    ],
-    "rules": [
-      "Add 500ml water per Factor meal to prevent puffiness",
-      "Rest day: remove white rice and halve Factor carbs"
-    ]
-  },
-  "supplements": [
-    { "timing": "Pre-Workout", "desc": "1-2 scoops ON Amino Energy (20-30 mins prior)" },
-    { "timing": "Post-Workout", "desc": "2 scoops Whey (25g/scoop) + 5g Creatine" },
-    { "timing": "Evening", "desc": "Magnesium Glycinate — muscle recovery & sleep" }
-  ]
-};
+// Quick-add buttons for protein
+const MEALS = [
+  { label: "Breakfast", g: 32 },
+  { label: "Shake", g: 52 },
+  { label: "Meal 3", g: 48 },
+  { label: "Dinner", g: 38 }
+];
 
 const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+const DAY_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-/* ---------- Personal Bests (stored in this browser) ---------- */
-const PB_KEY = 'gym_pbs_v1';
-const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+/* ---------- Storage (this browser only) ---------- */
+// gym_weights_v2: { "<week start YYYY-MM-DD>": { "<day>|<exercise>": lbs } }
+// gym_protein_v1: { "<YYYY-MM-DD>": grams }
+const WEIGHTS_KEY = 'gym_weights_v2';
+const PROTEIN_KEY = 'gym_protein_v1';
 
-function loadPBs() {
-  try { return JSON.parse(localStorage.getItem(PB_KEY)) || {}; }
+function load(key) {
+  try { return JSON.parse(localStorage.getItem(key)) || {}; }
   catch (e) { return {}; }
 }
-function savePBs(obj) {
-  localStorage.setItem(PB_KEY, JSON.stringify(obj));
-}
-function getPB(name) { return loadPBs()[name] || null; }
-function setPB(name, data) {
-  const all = loadPBs();
-  all[name] = data;
-  savePBs(all);
-}
-function removePB(name) {
-  const all = loadPBs();
-  delete all[name];
-  savePBs(all);
+function save(key, obj) {
+  try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
 }
 
-function localDateStr(d) {
-  d = d || new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+/* ---------- Dates (local time) ---------- */
+function ymd(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-function formatPBDate(str) {
-  if (!str) return '';
-  const d = new Date(str + 'T00:00:00');
-  return `${MONTH_SHORT[d.getMonth()]} ${d.getDate()}`;
+function parseYmd(s) { return new Date(s + 'T00:00:00'); }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function weekStart(d) { const x = new Date(d); x.setHours(0,0,0,0); return addDays(x, -x.getDay()); }
+function today() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+function short(d) { return `${MONTHS[d.getMonth()]} ${d.getDate()}`; }
+
+/* ---------- Weights ---------- */
+function liftKey(day, name) { return day + '|' + name; }
+function getWeight(weekKey, key) {
+  const w = load(WEIGHTS_KEY)[weekKey];
+  return w && w[key] != null ? w[key] : null;
+}
+function setWeight(weekKey, key, val) {
+  const all = load(WEIGHTS_KEY);
+  all[weekKey] = all[weekKey] || {};
+  if (val == null) delete all[weekKey][key];
+  else all[weekKey][key] = val;
+  save(WEIGHTS_KEY, all);
+}
+// Most recent weight logged before the given week.
+function lastWeight(weekKey, key) {
+  const all = load(WEIGHTS_KEY);
+  const weeks = Object.keys(all).filter(w => w < weekKey).sort().reverse();
+  for (const w of weeks) if (all[w][key] != null) return all[w][key];
+  return null;
 }
 
-// Unique list of every named exercise across the whole schedule, in order.
-function allExercises() {
-  const seen = new Set();
-  const list = [];
-  DAYS.forEach(dn => {
-    const day = DATA.schedule[dn];
-    if (day && day.exercises) {
-      day.exercises.forEach(ex => {
-        if (!seen.has(ex.name)) { seen.add(ex.name); list.push(ex.name); }
-      });
-    }
+/* ---------- Protein ---------- */
+function getProtein(dateKey) { return load(PROTEIN_KEY)[dateKey] || 0; }
+function setProtein(dateKey, g) {
+  const all = load(PROTEIN_KEY);
+  if (!g) delete all[dateKey]; else all[dateKey] = g;
+  save(PROTEIN_KEY, all);
+}
+
+// One-time import of old PBs into the week each was logged.
+(function migratePBs() {
+  const old = load('gym_pbs_v1');
+  if (!Object.keys(old).length || localStorage.getItem('gym_pbs_migrated')) return;
+  const all = load(WEIGHTS_KEY);
+  Object.entries(old).forEach(([name, pb]) => {
+    if (pb.weight == null || !pb.updated) return;
+    const wk = ymd(weekStart(parseYmd(pb.updated)));
+    DAYS.forEach(day => {
+      const ex = SCHEDULE[day].exercises;
+      if (ex && ex.some(e => e.name === name)) {
+        all[wk] = all[wk] || {};
+        if (all[wk][liftKey(day, name)] == null) all[wk][liftKey(day, name)] = pb.weight;
+      }
+    });
   });
-  return list;
+  save(WEIGHTS_KEY, all);
+  try { localStorage.setItem('gym_pbs_migrated', '1'); } catch (e) {}
+})();
+
+/* ---------- State ---------- */
+const state = { view: 'day', date: today(), week: weekStart(today()), month: today() };
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+function tabs() {
+  const t = (id, label) => `<button class="tab ${state.view === id ? 'active' : ''}" onclick="go('${id}')">${label}</button>`;
+  return `<div class="tabs">${t('day', 'Today')}${t('week', 'Week')}${t('progress', 'Progress')}</div>`;
 }
 
-function pbSummary(pb) {
-  if (!pb) return null;
-  const parts = [];
-  if (pb.weight != null) parts.push(pb.weight + ' lbs');
-  if (pb.sets != null && pb.reps != null) parts.push(pb.sets + '×' + pb.reps);
-  else if (pb.reps != null) parts.push(pb.reps + ' reps');
-  else if (pb.sets != null) parts.push(pb.sets + ' sets');
-  return parts.length ? parts.join(' · ') : null;
+function proteinBar(g) {
+  return `<div class="bar"><div style="width:${Math.min(100, g / PROTEIN_GOAL * 100)}%"></div></div>`;
 }
 
-// Escape a value for safe inclusion inside a single-quoted JS string in an attribute.
-function jsStr(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+/* ---------- Day view ---------- */
+function renderDay() {
+  const d = state.date;
+  const dayName = DAYS[d.getDay()];
+  const sched = SCHEDULE[dayName];
+  const wk = ymd(weekStart(d));
+  const dk = ymd(d);
+  const isToday = dk === ymd(today());
 
-function pbChipHtml(name) {
-  const pb = getPB(name);
-  const str = pbSummary(pb);
-  if (str) {
-    return `<div class="ex-pb" onclick="openPBEditor('${jsStr(name)}')">
-      <span class="ex-pb-val">PB ${str}</span>
-      ${pb.updated ? `<span class="ex-pb-date">· ${formatPBDate(pb.updated)}</span>` : ''}
-    </div>`;
-  }
-  return `<div class="ex-pb" onclick="openPBEditor('${jsStr(name)}')">
-    <span class="ex-pb-add">+ Log PB</span>
-  </div>`;
-}
+  let html = `<div class="label">${isToday ? 'Today · ' : ''}${DAY_SHORT[d.getDay()]} ${short(d)}</div>
+    <div class="title">${sched.title}</div>`;
 
-/* ---------- PB edit modal ---------- */
-let _editingPB = null;
-
-function openPBEditor(name) {
-  _editingPB = name;
-  const pb = getPB(name) || {};
-  document.getElementById('pb-modal-name').textContent = name;
-  document.getElementById('pb-weight').value = pb.weight != null ? pb.weight : '';
-  document.getElementById('pb-sets').value = pb.sets != null ? pb.sets : '';
-  document.getElementById('pb-reps').value = pb.reps != null ? pb.reps : '';
-  document.getElementById('pb-modal').style.display = 'flex';
-}
-function closePBEditor() {
-  document.getElementById('pb-modal').style.display = 'none';
-  _editingPB = null;
-}
-function pbModalBackdrop(e) {
-  if (e.target.id === 'pb-modal') closePBEditor();
-}
-function readNum(id) {
-  const v = document.getElementById(id).value.trim();
-  return v === '' ? null : Number(v);
-}
-function savePBFromModal() {
-  if (_editingPB == null) return;
-  const weight = readNum('pb-weight');
-  const sets = readNum('pb-sets');
-  const reps = readNum('pb-reps');
-  if (weight == null && sets == null && reps == null) { closePBEditor(); return; }
-  setPB(_editingPB, { weight, sets, reps, updated: localDateStr() });
-  closePBEditor();
-  _rerender();
-}
-function clearPBFromModal() {
-  if (_editingPB != null) removePB(_editingPB);
-  closePBEditor();
-  _rerender();
-}
-
-function formatTime(d) {
-  let h = d.getHours(), m = d.getMinutes();
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
-}
-
-function formatDate(d) {
-  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-}
-
-function cap(s) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function renderWorkout(day, dayData, showClock = true) {
-  const isRest = dayData.type === 'rest';
-  const isRecovery = dayData.type === 'recovery';
-  const isWorkout = dayData.type === 'workout';
-
-  const now = new Date();
-  const totalProtein = DATA.nutrition.meals.reduce((s, m) => s + m.protein_g, 0);
-  const workoutProtein = DATA.nutrition.meals.find(m => m.label === 'Post-Workout').protein_g;
-  const restProtein = totalProtein - workoutProtein;
-
-  let html = '';
-
-  // Header
-  html += `<div class="header">
-    <div>
-      <div class="day-label">${cap(day)}</div>
-      <div class="day-title"><span>${dayData.title}</span>${dayData.subtitle ? '<br><small style="font-size:14px;color:#888;font-weight:400">' + dayData.subtitle + '</small>' : ''}</div>
-    </div>
-    ${showClock ? `<div class="date-box">
-      <div class="time">${formatTime(now)}</div>
-      <div>${formatDate(now)}</div>
-    </div>` : ''}
-  </div>`;
-
-  // Progression banner (workout days only)
-  if (isWorkout) {
-    html += `<div class="progression">
-      <strong>Progression:</strong> ${DATA.rule_of_progression}
-    </div>`;
-  }
-
-  // Workout section
-  if (isWorkout) {
-    html += `<div class="exercises">
-      <div class="section-title">Today's Lifts</div>`;
-    dayData.exercises.forEach((ex, i) => {
-      html += `<div class="exercise-card">
-        <div class="ex-num">${i + 1}</div>
-        <div class="ex-body">
-          <div class="ex-name">${ex.name}</div>
-          <div class="ex-cue">${ex.cue}</div>
-          ${pbChipHtml(ex.name)}
+  if (sched.exercises) {
+    html += `<div class="section"><div class="label">Lifts · week of ${short(weekStart(d))}</div>`;
+    sched.exercises.forEach(ex => {
+      const key = liftKey(dayName, ex.name);
+      const cur = getWeight(wk, key);
+      const prev = lastWeight(wk, key);
+      html += `<div class="card row">
+        <div class="grow">
+          <div class="name">${esc(ex.name)}</div>
+          <div class="sub">${ex.sets} × ${ex.reps}${prev != null ? ` · last ${prev}` : ''}</div>
         </div>
-        <div class="ex-meta">
-          <div class="ex-sets">${ex.sets} x ${ex.reps}</div>
-          <div class="ex-reps">sets x reps</div>
-        </div>
+        <label class="wt">
+          <input type="number" inputmode="decimal" step="0.5" min="0"
+            value="${cur != null ? cur : ''}" placeholder="${prev != null ? prev : '-'}"
+            onchange="onWeight('${wk}', '${esc(key).replace(/'/g, "\\'")}', this.value)">
+          <span>lb</span>
+        </label>
       </div>`;
     });
     html += `</div>`;
+  } else {
+    html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
 
-  // Recovery / Rest activities
-  if (isRecovery || isRest) {
-    if (isRest) {
-      html += `<div class="rest-header">
-        <span class="rest-icon">&#x1F4AA;</span>
-        <div class="rest-text">Rest day. Recover hard.</div>
-      </div>`;
-    }
-    html += `<div class="exercises">
-      <div class="section-title">${isRest ? 'Priorities' : 'Activities'}</div>`;
-    dayData.activities.forEach(act => {
-      html += `<div class="activity-card">
-        <div class="activity-task">${act.task}</div>
-        <div class="activity-benefit">${act.benefit}</div>
-      </div>`;
-    });
-    html += `</div>`;
-  }
-
-  // Nutrition
-  const showPostWorkout = isWorkout;
-  const effectiveProtein = showPostWorkout ? totalProtein : restProtein;
-
-  html += `<div class="nutrition">
-    <div class="section-title">Nutrition — 170g Protein Goal</div>`;
-
-  DATA.nutrition.meals.forEach(meal => {
-    const skip = !showPostWorkout && meal.label === 'Post-Workout';
-    if (skip) return;
-    html += `<div class="meal-card">
-      <div class="meal-body">
-        <div class="meal-label">${meal.label}${meal.time ? ' · ' + meal.time : ''}</div>
-        <div class="meal-desc">${meal.description}</div>
-        ${meal.note ? `<div class="meal-note">${meal.note}</div>` : ''}
+  const g = getProtein(dk);
+  html += `<div class="section"><div class="label">Protein</div>
+    <div class="card">
+      <div class="protein-top">
+        <div class="protein-num">${g}<small> / ${PROTEIN_GOAL}g</small></div>
+        <div class="sub">${g >= PROTEIN_GOAL ? '<span class="hit">Goal hit</span>' : `${PROTEIN_GOAL - g}g left`}</div>
       </div>
-      <div class="meal-protein">${meal.protein_g}g</div>
-    </div>`;
-  });
-
-
-  if (!showPostWorkout) {
-    html += `<div class="rules"><div class="rule">Rest day: white rice removed, Factor carbs halved</div></div>`;
-  }
-
-  html += `<div class="rules">`;
-  DATA.nutrition.rules.slice(0,1).forEach(r => {
-    html += `<div class="rule">${r}</div>`;
-  });
-  html += `</div></div>`;
-
-  // Water
-  html += `<div class="water-bar">
-    <span class="label">Daily water target</span>
-    <span class="val">4 Liters</span>
-  </div>`;
-
-  // Supplements
-  html += `<div class="supplements">
-    <div class="section-title">Supplements</div>`;
-  DATA.supplements.forEach(s => {
-    const show = isWorkout || s.timing === 'Evening';
-    if (!show) return;
-    html += `<div class="supp-card">
-      <div class="supp-timing">${s.timing}</div>
-      <div class="supp-desc">${s.desc}</div>
-    </div>`;
-  });
-  html += `</div>`;
-
-  return html;
-}
-
-function dateKey(d) {
-  return d.toISOString().slice(0, 10);
-}
-
-function renderWeek(todayDate) {
-  const today = new Date(todayDate);
-  today.setHours(0,0,0,0);
-
-  // Build 15-day window: 7 past + today + 7 future
-  const days = [];
-  for (let i = -7; i <= 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    days.push(d);
-  }
-
-  const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-  let html = `<div class="nav">
-    <button class="nav-btn back" onclick="showToday()">&#8592; Today</button>
-  </div><div class="week-grid">`;
-
-  let lastSection = '';
-  days.forEach(d => {
-    const key = dateKey(d);
-    const isToday = key === dateKey(today);
-    const isPast = d < today;
-    const isPreProgram = d < PROGRAM_START;
-    const dayName = DAYS[d.getDay()];
-    const sched = DATA.schedule[dayName];
-    const hist = HISTORY[key];
-
-    // Section dividers
-    const section = isToday ? 'today' : isPast ? 'past' : 'upcoming';
-    if (section !== lastSection) {
-      if (section === 'today') html += `<div class="week-section-label">Today</div>`;
-      else if (section === 'upcoming') html += `<div class="week-section-label">Upcoming</div>`;
-      else if (lastSection === '') html += `<div class="week-section-label">Past</div>`;
-      lastSection = section;
-    }
-
-    const dateNum = d.getDate();
-    const dateMonth = MONTH_SHORT[d.getMonth()];
-    const dayLabel = DAY_NAMES[d.getDay()];
-
-    let cardClass = 'week-card';
-    let onclick = '';
-    let titleHtml = '';
-    let detailHtml = '';
-    let tagHtml = '';
-
-    if (isPreProgram) {
-      cardClass += ' pre-program';
-      titleHtml = `<div class="week-workout-title" style="color:var(--muted)">—</div>`;
-    } else if (isPast && hist) {
-      cardClass += ' past';
-      onclick = `onclick="showHistory('${key}')"`;
-      titleHtml = `<div class="week-workout-title">${hist.session_type}</div>`;
-      detailHtml = `<div class="week-detail">${hist.summary}</div>`;
-      tagHtml = `<span class="week-tag history">completed</span>`;
-    } else if (isPast && !hist) {
-      cardClass += ' past';
-      titleHtml = `<div class="week-workout-title">${sched.title}</div>`;
-      tagHtml = `<span class="week-tag ${sched.type}">${sched.type === 'rest' ? 'recovery' : sched.type}</span>`;
-    } else if (isToday) {
-      cardClass += ' today';
-      onclick = `onclick="showToday()"`;
-      titleHtml = `<div class="week-workout-title">${sched.title}</div>`;
-      const exList = sched.exercises ? sched.exercises.map(e => e.name).join(' · ') : sched.activities ? sched.activities.map(a => a.task).join(' · ') : '';
-      detailHtml = `<div class="week-detail">${exList}</div>`;
-      tagHtml = `<span class="week-tag ${sched.type}">${sched.type === 'rest' ? 'recovery' : sched.type}</span>`;
-    } else {
-      onclick = `onclick="showDay('${dayName}', '${key}')"`;
-      titleHtml = `<div class="week-workout-title">${sched.title}</div>`;
-      const exList = sched.exercises ? sched.exercises.map(e => e.name).join(' · ') : sched.activities ? sched.activities.map(a => a.task).join(' · ') : '';
-      detailHtml = `<div class="week-detail">${exList}</div>`;
-      tagHtml = `<span class="week-tag ${sched.type}">${sched.type === 'rest' ? 'recovery' : sched.type}</span>`;
-    }
-
-    html += `<div class="${cardClass}" ${onclick}>
-      <div class="week-date-col">
-        <div class="week-date-num">${dateNum}</div>
-        <div class="week-date-month">${dateMonth}</div>
+      ${proteinBar(g)}
+      <div class="chips">
+        ${MEALS.map(m => `<button class="chip" onclick="addProtein(${m.g})">${m.label} <b>+${m.g}</b></button>`).join('')}
       </div>
-      <div class="week-card-body">
-        <div class="week-day-name">${dayLabel}${isToday ? ' — Today' : ''}</div>
-        ${titleHtml}
-        ${detailHtml}
-        ${tagHtml}
+      <div class="protein-edit">
+        <input id="p-add" type="number" inputmode="numeric" placeholder="Add grams (use - to subtract)">
+        <button onclick="addProtein(Number(document.getElementById('p-add').value) || 0)">Add</button>
       </div>
-    </div>`;
-  });
-
-  html += `</div>`;
-  return html;
-}
-
-function renderHistoryView(key) {
-  const hist = HISTORY[key];
-  const d = new Date(key);
-  const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const MONTH = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  let html = `<div class="nav">
-    <button class="nav-btn back" onclick="showWeek()">&#8592; Week</button>
-    <button class="nav-btn" onclick="showToday()" style="margin-left:auto">Today</button>
-  </div>
-  <div class="history-card">
-    <div class="history-date">${DAY_NAMES[d.getDay()]}, ${MONTH[d.getMonth()]} ${d.getDate()}</div>
-    <div class="history-title">${hist.session_type}</div>
-    <div class="history-summary">${hist.summary}</div>
-    <div class="history-note">${hist.note}</div>
-  </div>`;
-  return html;
-}
-
-function renderDayView(dayName, dateLabel) {
-  const dayData = DATA.schedule[dayName];
-  const d = new Date(dateLabel);
-  const MONTH = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const DAY_NAMES_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const dateStr = `${DAY_NAMES_FULL[d.getDay()]}, ${MONTH[d.getMonth()]} ${d.getDate()}`;
-  let html = `<div class="nav">
-    <button class="nav-btn back" onclick="showWeek()">&#8592; Week</button>
-    <button class="nav-btn" onclick="showToday()" style="margin-left:auto">Today</button>
-  </div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">${dateStr}</div>`;
-  html += renderWorkout(dayName, dayData, false);
-  return html;
-}
-
-function renderPBs() {
-  let html = `<div class="nav">
-    <button class="nav-btn back" onclick="showToday()">&#8592; Today</button>
-    <button class="nav-btn" onclick="showWeek()" style="margin-left:auto">Week</button>
-  </div>
-  <div class="header">
-    <div>
-      <div class="day-label">Personal Bests</div>
-      <div class="day-title"><span>Heaviest Lifts</span></div>
     </div>
-  </div>
-  <div class="pb-intro">Tap any lift to log your heaviest set — weight, sets & reps. Each entry sticks and carries over week to week until you update it.</div>
-  <div class="pb-list">`;
+  </div>`;
 
-  allExercises().forEach(name => {
-    const pb = getPB(name);
-    const str = pbSummary(pb);
-    html += `<div class="pb-card" onclick="openPBEditor('${jsStr(name)}')">
-      <div class="pb-card-body">
-        <div class="pb-name">${name}</div>
-        ${str
-          ? `<div class="pb-updated">Updated ${formatPBDate(pb.updated)}</div>`
-          : `<div class="pb-updated none">Not logged yet</div>`}
+  if (sched.exercises) {
+    html += `<div class="sub">Pre: Amino Energy · Post: 2 whey + 5g creatine · Night: magnesium</div>`;
+  }
+  return html;
+}
+
+/* ---------- Week view ---------- */
+function renderWeek() {
+  const ws = state.week;
+  const tk = ymd(today());
+  let html = `<div class="pager">
+    <button onclick="shiftWeek(-1)">&#8592;</button>
+    <div class="label">${short(ws)} - ${short(addDays(ws, 6))}</div>
+    <button onclick="shiftWeek(1)">&#8594;</button>
+  </div>`;
+
+  let total = 0, logged = 0, hits = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(ws, i);
+    const dk = ymd(d);
+    const sched = SCHEDULE[DAYS[i]];
+    const g = getProtein(dk);
+    if (g) { total += g; logged++; if (g >= PROTEIN_GOAL) hits++; }
+
+    let detail = '';
+    if (sched.exercises) {
+      const done = sched.exercises.filter(ex => getWeight(ymd(ws), liftKey(DAYS[i], ex.name)) != null).length;
+      detail = `${done}/${sched.exercises.length} lifts logged`;
+    }
+
+    html += `<div class="card row day-row ${dk === tk ? 'today' : ''}" onclick="openDay('${dk}')">
+      <div class="day-date"><div class="sub">${DAY_SHORT[i]}</div><b>${d.getDate()}</b></div>
+      <div class="grow">
+        <div class="name">${sched.title}</div>
+        ${detail ? `<div class="sub">${detail}</div>` : ''}
       </div>
-      <div class="pb-value">${str ? str : '<span class="pb-add">+ Add</span>'}</div>
+      <div class="day-protein ${g >= PROTEIN_GOAL ? 'hit' : ''}">${g ? g + 'g' : '<span class="sub">-</span>'}${g ? proteinBar(g) : ''}</div>
     </div>`;
-  });
+  }
 
+  html += `<div class="stats" style="margin-top:12px">
+    <div class="card stat"><b>${logged ? Math.round(total / logged) : '-'}</b><span class="sub">avg g/day</span></div>
+    <div class="card stat"><b>${hits}/7</b><span class="sub">days at goal</span></div>
+  </div>`;
+  return html;
+}
+
+/* ---------- Progress view ---------- */
+function renderProgress() {
+  const m = state.month;
+  const first = new Date(m.getFullYear(), m.getMonth(), 1);
+  const daysIn = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+  const tk = ymd(today());
+
+  let total = 0, logged = 0, hits = 0;
+  let cells = DAY_SHORT.map(s => `<div class="dow">${s[0]}</div>`).join('');
+  for (let i = 0; i < first.getDay(); i++) cells += `<div class="blank"></div>`;
+  for (let day = 1; day <= daysIn; day++) {
+    const d = new Date(m.getFullYear(), m.getMonth(), day);
+    const dk = ymd(d);
+    const g = getProtein(dk);
+    if (g) { total += g; logged++; if (g >= PROTEIN_GOAL) hits++; }
+    cells += `<div class="cell ${g >= PROTEIN_GOAL ? 'hit' : ''} ${dk === tk ? 'today' : ''}" onclick="openDay('${dk}')">
+      <div class="d">${day}</div><div class="g">${g || ''}</div>
+    </div>`;
+  }
+
+  let html = `<div class="section">
+    <div class="pager">
+      <button onclick="shiftMonth(-1)">&#8592;</button>
+      <div class="label">Protein · ${MONTHS_FULL[m.getMonth()]} ${m.getFullYear()}</div>
+      <button onclick="shiftMonth(1)">&#8594;</button>
+    </div>
+    <div class="stats">
+      <div class="card stat"><b>${logged ? Math.round(total / logged) : '-'}</b><span class="sub">avg g/day</span></div>
+      <div class="card stat"><b>${hits}/${logged}</b><span class="sub">days at goal</span></div>
+    </div>
+    <div class="cal">${cells}</div>
+  </div>`;
+
+  // Lift weights for the last 6 weeks
+  const weeks = [];
+  for (let i = 5; i >= 0; i--) weeks.push(addDays(weekStart(today()), -7 * i));
+  const all = load(WEIGHTS_KEY);
+  html += `<div class="section"><div class="label">Lifts · last 6 weeks (lb)</div>`;
+  DAYS.forEach(day => {
+    const sched = SCHEDULE[day];
+    if (!sched.exercises) return;
+    html += `<div class="card table-wrap"><table>
+      <tr><th>${DAY_SHORT[DAYS.indexOf(day)]} · ${sched.title}</th>${weeks.map(w => `<th>${w.getMonth() + 1}/${w.getDate()}</th>`).join('')}</tr>`;
+    sched.exercises.forEach((ex, i) => {
+      const key = liftKey(day, ex.name);
+      html += `<tr><td>${esc(ex.name)}</td>${weeks.map((w, j) => {
+        const v = all[ymd(w)] && all[ymd(w)][key];
+        return v != null ? `<td class="${j === 5 ? 'cur' : ''}">${v}</td>` : `<td class="empty">-</td>`;
+      }).join('')}</tr>`;
+    });
+    html += `</table></div>`;
+  });
   html += `</div>`;
   return html;
 }
 
-let _todayDate = new Date();
-let _todayName = '';
-let _rerender = showToday;
-
-function showToday() {
-  _rerender = showToday;
-  document.getElementById('app').innerHTML =
-    `<div class="nav" style="justify-content:flex-end">
-      <button class="nav-btn" onclick="showPBs()">PBs</button>
-      <button class="nav-btn" onclick="showWeek()">Week</button>
-    </div>` + renderWorkout(_todayName, DATA.schedule[_todayName]);
+/* ---------- Actions ---------- */
+function render() {
+  const body = state.view === 'week' ? renderWeek() : state.view === 'progress' ? renderProgress() : renderDay();
+  document.getElementById('app').innerHTML = tabs() + body;
+}
+function go(view) {
+  state.view = view;
+  if (view === 'day') state.date = today();
+  if (view === 'week') state.week = weekStart(today());
+  render();
+  window.scrollTo(0, 0);
+}
+function openDay(dk) { state.view = 'day'; state.date = parseYmd(dk); render(); window.scrollTo(0, 0); }
+function shiftWeek(n) { state.week = addDays(state.week, 7 * n); render(); }
+function shiftMonth(n) { state.month = new Date(state.month.getFullYear(), state.month.getMonth() + n, 1); render(); }
+function onWeight(wk, key, val) {
+  val = val.trim();
+  setWeight(wk, key, val === '' ? null : Number(val));
+}
+function addProtein(g) {
+  const dk = ymd(state.date);
+  setProtein(dk, Math.max(0, getProtein(dk) + g));
+  render();
 }
 
-function showWeek() {
-  _rerender = showWeek;
-  document.getElementById('app').innerHTML = renderWeek(_todayDate);
-  // Scroll today into view
-  const todayCard = document.querySelector('.week-card.today');
-  if (todayCard) todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function showDay(dayName, dateLabel) {
-  _rerender = () => showDay(dayName, dateLabel);
-  document.getElementById('app').innerHTML = renderDayView(dayName, dateLabel);
-}
-
-function showHistory(key) {
-  _rerender = () => showHistory(key);
-  document.getElementById('app').innerHTML = renderHistoryView(key);
-}
-
-function showPBs() {
-  _rerender = showPBs;
-  document.getElementById('app').innerHTML = renderPBs();
-}
-
-function init() {
-  _todayDate = new Date();
-  _todayDate.setHours(0,0,0,0);
-  _todayName = DAYS[_todayDate.getDay()];
-  showToday();
-}
-
-// Refresh time every minute
-init();
-setInterval(() => {
-  const timeEl = document.querySelector('.time');
-  if (timeEl) timeEl.textContent = formatTime(new Date());
-}, 60000);
+render();
 </script>
 
 </body>
