@@ -122,6 +122,12 @@
     .bar.kcal.over div { background: var(--red); }
     .over { color: var(--red); }
     .nutri-row + .nutri-row { margin-top: 12px; }
+    .log { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 6px; }
+    .log-row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; }
+    .log-row .at { color: var(--dim); width: 58px; flex-shrink: 0; }
+    .log-row .what { flex: 1; min-width: 0; }
+    .log-row .nums { color: var(--muted); white-space: nowrap; }
+    .log-row button { background: none; border: none; color: var(--dim); font-size: 16px; padding: 0 4px; }
     .chip:active { border-color: var(--green); }
     .protein-edit { display: flex; gap: 6px; margin-top: 10px; }
     .protein-edit input {
@@ -211,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 19; // bump on every push
+const APP_VERSION = 20; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 2000; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -283,7 +289,7 @@ const FILLERS = [
   { label: "Cream cheese (1 tbsp)", g: 1, kcal: 50 }
 ].sort(byLabel);
 function chip(m) {
-  return `<button class="chip" onclick="addFood(${m.g}, ${m.kcal})">${m.label} ${m.g ? `<b>+${m.g}g</b> ` : ''}<i>${m.kcal}</i></button>`;
+  return `<button class="chip" onclick="addFood(${m.g}, ${m.kcal}, '${esc(m.label).replace(/'/g, "\\'")}')">${m.label} ${m.g ? `<b>+${m.g}g</b> ` : ''}<i>${m.kcal}</i></button>`;
 }
 
 const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
@@ -296,10 +302,12 @@ const MONTHS_FULL = ['January','February','March','April','May','June','July','A
 // gym_protein_v1: { "<YYYY-MM-DD>": grams }
 // gym_cal_v1: { "<YYYY-MM-DD>": kcal }
 // gym_body_v1: { "<YYYY-MM-DD>": lbs }
+// gym_foodlog_v1: { "<YYYY-MM-DD>": [{ label, g, kcal, at }] }
 const WEIGHTS_KEY = 'gym_weights_v2';
 const PROTEIN_KEY = 'gym_protein_v1';
 const CAL_KEY = 'gym_cal_v1';
 const BODY_KEY = 'gym_body_v1';
+const FOODLOG_KEY = 'gym_foodlog_v1';
 
 function load(key) {
   try { return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -458,6 +466,12 @@ function setProtein(dateKey, g) {
   if (!g) delete all[dateKey]; else all[dateKey] = g;
   save(PROTEIN_KEY, all);
 }
+function getFoodLog(dateKey) { return load(FOODLOG_KEY)[dateKey] || []; }
+function setFoodLog(dateKey, log) {
+  const all = load(FOODLOG_KEY);
+  if (!log.length) delete all[dateKey]; else all[dateKey] = log;
+  save(FOODLOG_KEY, all);
+}
 function getCal(dateKey) { return load(CAL_KEY)[dateKey] || 0; }
 function setCal(dateKey, kcal) {
   const all = load(CAL_KEY);
@@ -589,6 +603,7 @@ function renderDay() {
         </div>
         ${calBar(k)}
       </div>
+      ${foodLog(dk, g, k)}
       <div class="chips">
         ${MEALS.map(chip).join('')}
       </div>
@@ -607,6 +622,26 @@ function renderDay() {
 
   html += `<div class="sub">Daily: 20-30 min walk · 5g creatine · 2 fish oil · 1 vitamin D/K</div>`;
   return html;
+}
+
+// What was eaten on this day, with an x to remove a mistake.
+function foodLog(dk, g, k) {
+  const log = getFoodLog(dk);
+  if (!log.length && !g && !k) return '';
+  let rows = log.map((e, i) => `<div class="log-row">
+    <span class="at">${e.at}</span>
+    <span class="what">${esc(e.label)}</span>
+    <span class="nums">${e.g}g · ${e.kcal}</span>
+    <button onclick="removeFood(${i})" aria-label="Remove">&times;</button>
+  </div>`).join('');
+  // Totals logged before the list existed have no items.
+  const restG = g - log.reduce((a, e) => a + e.g, 0);
+  const restK = k - log.reduce((a, e) => a + e.kcal, 0);
+  if (restG > 0 || restK > 0) {
+    rows = `<div class="log-row"><span class="at"></span><span class="what sub">Earlier (no details)</span>
+      <span class="nums">${Math.max(0, restG)}g · ${Math.max(0, restK)}</span><button style="visibility:hidden">&times;</button></div>` + rows;
+  }
+  return `<div class="log">${rows}</div>`;
 }
 
 /* ---------- Week view ---------- */
@@ -807,10 +842,24 @@ function onBody(dk, val) {
   setBody(dk, val === '' ? null : Number(val));
   render();
 }
-function addFood(g, kcal) {
+function addFood(g, kcal, label) {
+  if (!g && !kcal) return;
   const dk = ymd(state.date);
+  const now = new Date();
+  const at = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  setFoodLog(dk, getFoodLog(dk).concat({ label: label || 'Custom', g, kcal, at }));
   setProtein(dk, Math.max(0, getProtein(dk) + g));
   setCal(dk, Math.max(0, getCal(dk) + kcal));
+  render();
+}
+function removeFood(i) {
+  const dk = ymd(state.date);
+  const log = getFoodLog(dk);
+  const e = log.splice(i, 1)[0];
+  if (!e) return;
+  setFoodLog(dk, log);
+  setProtein(dk, Math.max(0, getProtein(dk) - e.g));
+  setCal(dk, Math.max(0, getCal(dk) - e.kcal));
   render();
 }
 
