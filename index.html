@@ -217,52 +217,46 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 22; // bump on every push
+const APP_VERSION = 23; // bump on every push
 const PROTEIN_GOAL = 175;
-const CAL_GOAL = 2000; // daily limit, not a minimum
+const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
 
+// Each lifting day is 2 supersets: exercises 1+2 are A, 3+4 are B.
+// Each pair works different muscles so one rests while the other works.
 const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
     { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max", tip: "Full hang at the bottom, chin over the bar. Under 5 reps? Use the lat pulldown." },
+    { name: "Lateral Raises", sets: 3, reps: 15, tip: "Light weight. Raise to shoulder height, slight bend in elbows." },
     { name: "Hammer-Grip Machine Row", sets: 4, reps: "8-10", tip: "Chest on the pad. Pull elbows back, squeeze shoulder blades." },
-    { name: "Face Pulls", sets: 3, reps: 15, tip: "Rope at face height. Pull to forehead, elbows high." },
-    { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: "Elbows pinned to your sides. No swinging." },
-    { name: "Hammer Curls", sets: 2, reps: 12, tip: "Dumbbells, thumbs up the whole time." }
+    { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: "Elbows pinned to your sides. No swinging." }
   ]},
   monday: { title: "Push", exercises: [
     { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
-    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: "Bench at about 30 degrees. Press up over your upper chest." },
-    { name: "Standing DB Press", sets: 3, reps: "8-10", tip: "Brace your abs. Press straight overhead, do not lean back." },
     { name: "Lateral Raises", sets: 4, reps: "12-15", tip: "Light weight. Raise to shoulder height, slight bend in elbows." },
+    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: "Bench at about 30 degrees. Press up over your upper chest." },
     { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12", tip: "Elbows pinned. Spread the rope apart at the bottom." }
   ]},
   tuesday: { title: "Legs", exercises: [
     { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
-    { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: "Push hips back, flat back. Stop at a strong hamstring stretch." },
-    { name: "Goblet Squats", sets: 3, reps: 10, tip: "Hold one dumbbell at your chest. Sit down between your heels." },
     { name: "Leg Curls", sets: 3, reps: "10-12", tip: "Squeeze hard, return slowly." },
+    { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: "Push hips back, flat back. Stop at a strong hamstring stretch." },
     { name: "Standing Calf Raises", sets: 4, reps: "12-15", tip: "Full stretch at the bottom, 1 second pause at the top." }
   ]},
-  wednesday: { title: "Walk", activities: ["30-45 min walk or treadmill", "8-10k steps"] },
+  wednesday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] },
   thursday: { title: "Upper", exercises: [
     { name: "Incline DB Press", sets: 3, reps: "8-10", tip: "Bench at about 30 degrees. Press up over your upper chest." },
     { name: "Lat Pulldowns", sets: 3, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little." },
-    { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10", tip: "Bench upright. Press straight overhead." },
-    { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: "Chest on the pad. Pull elbows back, squeeze shoulder blades." },
-    { name: "Lateral Raises", sets: 3, reps: 15, tip: "Light weight. Raise to shoulder height, slight bend in elbows." },
-    { name: "EZ Bar Curls", sets: 3, reps: 12, tip: "Elbows pinned to your sides. No swinging." },
-    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head." }
+    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head." },
+    { name: "EZ Bar Curls", sets: 3, reps: 12, tip: "Elbows pinned to your sides. No swinging." }
   ]},
   friday: { title: "Lower + Core", exercises: [
-    { name: "Dumbbell RDLs", sets: 3, reps: 8, tip: "Push hips back, flat back. Stop at a strong hamstring stretch." },
     { name: "Walking Lunges", sets: 3, reps: "10/leg", tip: "Dumbbells at sides. Long steps, back knee near the floor." },
+    { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: "Pull-up bar. Knees to chest, no swinging." },
     { name: "Leg Extensions", sets: 3, reps: "12-15", tip: "1 second squeeze at the top, return slowly." },
-    { name: "Leg Curls", sets: 3, reps: 12, tip: "Squeeze hard, return slowly." },
-    { name: "Standing Calf Raises", sets: 3, reps: 15, tip: "Full stretch at the bottom, 1 second pause at the top." },
-    { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: "Pull-up bar. Knees to chest, no swinging." }
+    { name: "Leg Curls", sets: 3, reps: 12, tip: "Squeeze hard, return slowly." }
   ]},
-  saturday: { title: "Walk", activities: ["30-45 min walk or treadmill", "8-10k steps", "8+ hours sleep"] }
+  saturday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] }
 };
 
 // Quick-add buttons: g = protein, kcal = calories. Each row shows sorted by name.
@@ -566,10 +560,12 @@ function renderDay() {
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
       const prev = lastWeight(wk, key);
+      const pair = (i < 2 ? 'A' : 'B') + (i % 2 + 1);
+      if (i % 2 === 0) html += `<div class="label" style="margin:${i ? 14 : 4}px 0 6px">Superset ${pair[0]}</div>`;
       html += `<div class="card row">
         <div class="grow">
-          <div class="name">${esc(ex.name)}</div>
-          <div class="sub">${ex.sets} × ${ex.reps} · rest ${i === 0 ? '2-3 min' : '60-90s'}${prev != null ? ` · last ${prev}` : ''}</div>
+          <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}</div>
+          <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}</div>
           ${ex.tip ? `<div class="sub" style="color:var(--dim)">${esc(ex.tip)}</div>` : ''}
         </div>
         <label class="wt">
@@ -580,7 +576,7 @@ function renderDay() {
         </label>
       </div>`;
     });
-    html += `<div class="sub" style="margin-top:6px">Last set of each lift: go until you cannot do another rep. Other sets: stop 1-2 reps short. Hit the top reps on every set = add weight next week.</div></div>`;
+    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B the same way. Last set of each lift: go until you cannot do another rep. Other sets: stop 1-2 reps short. Hit the top reps on every set = add weight next week.</div></div>`;
   } else {
     html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
@@ -620,7 +616,7 @@ function renderDay() {
     </div>
   </div>`;
 
-  html += `<div class="sub">Daily: 20-30 min walk · 5g creatine · 2 fish oil · 1 vitamin D/K</div>`;
+  html += `<div class="sub">Daily: 5g creatine · 2 fish oil · 1 vitamin D/K · 7-9 h sleep · walking is optional</div>`;
   return html;
 }
 
