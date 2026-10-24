@@ -264,6 +264,18 @@ const MEALS = [
   { label: "Cottage cheese (200g)", g: 20, kcal: 150 },
   { label: "0% Greek yogurt (170g)", g: 15, kcal: 110 }
 ];
+// Calorie fillers, sorted by kcal
+const FILLERS = [
+  { label: "Bagel", g: 10, kcal: 280 },
+  { label: "Rice (1 cup cooked)", g: 4, kcal: 205 },
+  { label: "Banana", g: 1, kcal: 105 },
+  { label: "Apple", g: 0, kcal: 95 },
+  { label: "Toast (1 slice)", g: 3, kcal: 80 },
+  { label: "Egg", g: 6, kcal: 70 }
+];
+function chip(m) {
+  return `<button class="chip" onclick="addFood(${m.g}, ${m.kcal})">${m.label} ${m.g ? `<b>+${m.g}g</b> ` : ''}<i>${m.kcal}</i></button>`;
+}
 
 const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
 const DAY_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -423,7 +435,11 @@ function renderDay() {
         ${calBar(k)}
       </div>
       <div class="chips">
-        ${MEALS.map(m => `<button class="chip" onclick="addFood(${m.g}, ${m.kcal})">${m.label} <b>+${m.g}g</b> <i>${m.kcal}</i></button>`).join('')}
+        ${MEALS.map(chip).join('')}
+      </div>
+      <div class="label" style="margin-top:12px">Fillers</div>
+      <div class="chips" style="margin-top:6px">
+        ${FILLERS.map(chip).join('')}
       </div>
       <div class="protein-edit">
         <input id="p-add" type="number" inputmode="numeric" placeholder="Protein g">
