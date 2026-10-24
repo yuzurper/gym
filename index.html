@@ -255,16 +255,17 @@ const SCHEDULE = {
   saturday: { title: "Rest", activities: ["8+ hours sleep", "Pick Factor meals"] }
 };
 
-// Quick-add buttons: g = protein, kcal = calories
+// Quick-add buttons: g = protein, kcal = calories. Each row shows sorted by name.
+const byLabel = (a, b) => a.label.localeCompare(b.label);
 const MEALS = [
-  { label: "Whey (2 scoops)", g: 50, kcal: 240 },
+  { label: "Protein Powder (2 scoops)", g: 50, kcal: 240 },
   { label: "Chicken/Beef (1 cup)", g: 40, kcal: 250 },
   { label: "Protein Seltzer", g: 30, kcal: 130 },
   { label: "Tuna can", g: 25, kcal: 110 },
   { label: "Cottage cheese (200g)", g: 20, kcal: 150 },
-  { label: "0% Greek yogurt (170g)", g: 15, kcal: 110 }
-];
-// Calorie fillers, sorted by kcal, then spreads (1 tbsp each)
+  { label: "Greek yogurt (0%, 170g)", g: 15, kcal: 110 }
+].sort(byLabel);
+// Calorie fillers
 const FILLERS = [
   { label: "Bagel", g: 10, kcal: 280 },
   { label: "Rice (1 cup cooked)", g: 4, kcal: 205 },
@@ -274,7 +275,7 @@ const FILLERS = [
   { label: "Egg", g: 6, kcal: 70 },
   { label: "Peanut butter (1 tbsp)", g: 4, kcal: 95 },
   { label: "Cream cheese (1 tbsp)", g: 1, kcal: 50 }
-];
+].sort(byLabel);
 function chip(m) {
   return `<button class="chip" onclick="addFood(${m.g}, ${m.kcal})">${m.label} ${m.g ? `<b>+${m.g}g</b> ` : ''}<i>${m.kcal}</i></button>`;
 }
