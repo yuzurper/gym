@@ -211,7 +211,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 16; // bump on every push
+const APP_VERSION = 17; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 2150; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -813,8 +813,25 @@ function addFood(g, kcal) {
   render();
 }
 
+// The home screen app has no refresh, and Pages caches for 10 min.
+// On open, ask for the page with no cache. If it has a newer APP_VERSION,
+// load it from a new ?v= URL so no cache can serve the old copy.
+async function checkUpdate() {
+  try {
+    const res = await fetch(location.pathname + '?nc=' + Date.now(), { cache: 'no-store' });
+    const m = (await res.text()).match(/APP_VERSION = (\d+)/);
+    const latest = m ? Number(m[1]) : 0;
+    if (latest > APP_VERSION && sessionStorage.getItem('gym_update_tried') !== String(latest)) {
+      sessionStorage.setItem('gym_update_tried', String(latest));
+      location.replace(location.pathname + '?v=' + latest + location.hash);
+    }
+  } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
+
 render();
 initSync();
+checkUpdate();
 </script>
 
 </body>
