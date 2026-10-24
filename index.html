@@ -211,6 +211,7 @@
 <div id="app"></div>
 
 <script>
+const APP_VERSION = 12; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 2150; // daily limit, not a minimum
 
@@ -568,7 +569,8 @@ function renderProgress() {
 /* ---------- Actions ---------- */
 function render() {
   const body = state.view === 'week' ? renderWeek() : state.view === 'progress' ? renderProgress() : renderDay();
-  document.getElementById('app').innerHTML = tabs() + body;
+  document.getElementById('app').innerHTML = tabs() + body +
+    `<div class="sub" style="text-align:center;color:var(--dim);margin-top:24px">v${APP_VERSION}</div>`;
 }
 function go(view) {
   state.view = view;
