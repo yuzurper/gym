@@ -216,43 +216,46 @@ const CAL_GOAL = 2150; // daily limit, not a minimum
 
 const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
-    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Failure" },
-    { name: "Lat Pulldowns", sets: 3, reps: "8-10" },
-    { name: "Heavy DB Rows", sets: 3, reps: "8-10" },
+    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max (pulldown if <5)" },
+    { name: "Hammer-Grip Machine Row", sets: 3, reps: "8-10" },
+    { name: "Single Arm DB Rows", sets: 3, reps: "10-12" },
     { name: "Face Pulls", sets: 3, reps: 15 },
-    { name: "Rope Hammer Curls", sets: 3, reps: "12-15" },
-    { name: "Incline DB Curls", sets: 3, reps: 12 },
-    { name: "Dead Hangs", sets: 2, reps: "Failure" }
+    { name: "EZ Bar Curls", sets: 3, reps: "10-12" },
+    { name: "Hammer Curls", sets: 2, reps: 12 }
   ]},
   monday: { title: "Push", exercises: [
-    { name: "Incline DB Press", sets: 4, reps: "8-10" },
+    { name: "DB Flat Press", sets: 4, reps: "6-8" },
+    { name: "Incline DB Press", sets: 3, reps: "8-10" },
     { name: "Standing DB Press", sets: 3, reps: "8-10" },
-    { name: "Lateral Raises", sets: 4, reps: 15 },
-    { name: "Cable Flyes", sets: 3, reps: "12-15" },
-    { name: "Tricep Rope Pushdowns", sets: 3, reps: "12-15" }
+    { name: "Lateral Raises", sets: 4, reps: "12-15" },
+    { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12" }
   ]},
   tuesday: { title: "Legs", exercises: [
-    { name: "Leg Press", sets: 4, reps: "10-12" },
-    { name: "Leg Extensions", sets: 3, reps: 15 },
-    { name: "Seated Leg Curls", sets: 3, reps: "12-15" },
-    { name: "Standing Calf Raises", sets: 4, reps: "15-20" }
+    { name: "Leg Press", sets: 4, reps: "6-8" },
+    { name: "Dumbbell RDLs", sets: 3, reps: "8-10" },
+    { name: "Goblet Squats", sets: 3, reps: 10 },
+    { name: "Leg Curls", sets: 3, reps: "10-12" },
+    { name: "Standing Calf Raises", sets: 4, reps: "12-15" }
   ]},
-  wednesday: { title: "Active Recovery", activities: ["30-min brisk walk", "Static stretching"] },
-  thursday: { title: "Upper Pump", exercises: [
-    { name: "DB Flat Press", sets: 3, reps: "12-15" },
-    { name: "Single Arm Rows", sets: 3, reps: "12-15" },
-    { name: "Lateral Raises", sets: 3, reps: 20 },
-    { name: "Cable Curls / Pushdowns", sets: 3, reps: 15 },
-    { name: "Hanging Knee Raises", sets: 3, reps: 15 }
+  wednesday: { title: "Walk", activities: ["30-45 min walk or treadmill", "8-10k steps"] },
+  thursday: { title: "Upper", exercises: [
+    { name: "Incline DB Press", sets: 3, reps: "8-10" },
+    { name: "Lat Pulldowns", sets: 3, reps: "8-10" },
+    { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10" },
+    { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12" },
+    { name: "Lateral Raises", sets: 3, reps: 15 },
+    { name: "EZ Bar Curls", sets: 3, reps: 12 },
+    { name: "Tricep Rope Pushdowns", sets: 3, reps: 12 }
   ]},
-  friday: { title: "Legs + Core", exercises: [
-    { name: "Dumbbell RDLs", sets: 3, reps: "10-12" },
-    { name: "Goblet Squats", sets: 3, reps: 12 },
-    { name: "Walking Lunges", sets: 2, reps: "10/leg" },
-    { name: "Standing Calf Raises", sets: 3, reps: "15-20" },
+  friday: { title: "Lower + Core", exercises: [
+    { name: "Dumbbell RDLs", sets: 3, reps: 8 },
+    { name: "Walking Lunges", sets: 3, reps: "10/leg" },
+    { name: "Leg Extensions", sets: 3, reps: "12-15" },
+    { name: "Leg Curls", sets: 3, reps: 12 },
+    { name: "Standing Calf Raises", sets: 3, reps: 15 },
     { name: "Hanging Knee Raises", sets: 3, reps: "12-15" }
   ]},
-  saturday: { title: "Rest", activities: ["8+ hours sleep", "Pick Factor meals"] }
+  saturday: { title: "Walk", activities: ["30-45 min walk or treadmill", "8-10k steps", "8+ hours sleep"] }
 };
 
 // Quick-add buttons: g = protein, kcal = calories. Each row shows sorted by name.
@@ -414,7 +417,7 @@ function renderDay() {
         </label>
       </div>`;
     });
-    html += `</div>`;
+    html += `<div class="sub" style="margin-top:6px">Top reps on every set = add weight next week · Rest 2-3 min on the first lift, 60-90s after</div></div>`;
   } else {
     html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
