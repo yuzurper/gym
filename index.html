@@ -17,6 +17,8 @@
       --muted: #888;
       --dim: #555;
       --green: #44cc88;
+      --orange: #ffaa33;
+      --red: #ff5566;
     }
 
     body {
@@ -113,10 +115,18 @@
       font-size: 13px;
     }
     .chip b { color: var(--green); }
+    .chip i { color: var(--orange); font-style: normal; font-size: 12px; }
+    .cal-num { font-size: 28px; font-weight: 700; color: var(--orange); }
+    .cal-num small { font-size: 14px; color: var(--muted); font-weight: 500; }
+    .bar.kcal div { background: var(--orange); }
+    .bar.kcal.over div { background: var(--red); }
+    .over { color: var(--red); }
+    .nutri-row + .nutri-row { margin-top: 12px; }
     .chip:active { border-color: var(--green); }
     .protein-edit { display: flex; gap: 6px; margin-top: 10px; }
     .protein-edit input {
       flex: 1;
+      width: 0;
       min-width: 0;
       background: var(--bg);
       border: 1px solid var(--border);
@@ -152,7 +162,7 @@
     .day-date { width: 40px; text-align: center; }
     .day-date b { display: block; font-size: 17px; }
     .day-row.today .day-date b { color: var(--accent); }
-    .day-protein { width: 64px; text-align: right; font-size: 13px; font-weight: 700; }
+    .day-protein { width: 72px; text-align: right; font-size: 13px; font-weight: 700; }
     .day-protein .bar { margin-top: 4px; height: 4px; }
     .hit { color: var(--green); }
 
@@ -174,6 +184,8 @@
     }
     .cal .cell .d { font-size: 10px; color: var(--muted); }
     .cal .cell .g { font-size: 13px; font-weight: 700; }
+    .cal .cell .k { font-size: 9px; color: var(--orange); }
+    .cal .cell .k.over { color: var(--red); }
     .cal .cell.hit { background: #0e2419; border-color: #1f5a3c; }
     .cal .cell.today { border-color: var(--accent); }
     .cal .blank { visibility: hidden; }
@@ -199,7 +211,8 @@
 <div id="app"></div>
 
 <script>
-const PROTEIN_GOAL = 170;
+const PROTEIN_GOAL = 175;
+const CAL_GOAL = 2150; // daily limit, not a minimum
 
 const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
@@ -242,15 +255,14 @@ const SCHEDULE = {
   saturday: { title: "Rest", activities: ["8+ hours sleep", "Pick Factor meals"] }
 };
 
-// Quick-add buttons for protein
+// Quick-add buttons: g = protein, kcal = calories
 const MEALS = [
-  { label: "Shake", g: 50 },
-  { label: "Breakfast", g: 30 },
-  { label: "Protein Seltzer", g: 30 },
-  { label: "Chicken/Steak", g: 30 },
-  { label: "Tuna can", g: 25 },
-  { label: "Cottage cheese", g: 25 },
-  { label: "Greek yogurt", g: 23 }
+  { label: "Whey (2 scoops)", g: 50, kcal: 240 },
+  { label: "Chicken/Beef (1 cup)", g: 40, kcal: 250 },
+  { label: "Protein Seltzer", g: 30, kcal: 130 },
+  { label: "Tuna can", g: 25, kcal: 110 },
+  { label: "Cottage cheese (200g)", g: 20, kcal: 150 },
+  { label: "0% Greek yogurt (170g)", g: 15, kcal: 110 }
 ];
 
 const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
@@ -261,8 +273,10 @@ const MONTHS_FULL = ['January','February','March','April','May','June','July','A
 /* ---------- Storage (this browser only) ---------- */
 // gym_weights_v2: { "<week start YYYY-MM-DD>": { "<day>|<exercise>": lbs } }
 // gym_protein_v1: { "<YYYY-MM-DD>": grams }
+// gym_cal_v1: { "<YYYY-MM-DD>": kcal }
 const WEIGHTS_KEY = 'gym_weights_v2';
 const PROTEIN_KEY = 'gym_protein_v1';
+const CAL_KEY = 'gym_cal_v1';
 
 function load(key) {
   try { return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -310,6 +324,12 @@ function setProtein(dateKey, g) {
   if (!g) delete all[dateKey]; else all[dateKey] = g;
   save(PROTEIN_KEY, all);
 }
+function getCal(dateKey) { return load(CAL_KEY)[dateKey] || 0; }
+function setCal(dateKey, kcal) {
+  const all = load(CAL_KEY);
+  if (!kcal) delete all[dateKey]; else all[dateKey] = kcal;
+  save(CAL_KEY, all);
+}
 
 // One-time import of old PBs into the week each was logged.
 (function migratePBs() {
@@ -343,6 +363,9 @@ function tabs() {
 
 function proteinBar(g) {
   return `<div class="bar"><div style="width:${Math.min(100, g / PROTEIN_GOAL * 100)}%"></div></div>`;
+}
+function calBar(k) {
+  return `<div class="bar kcal ${k > CAL_GOAL ? 'over' : ''}"><div style="width:${Math.min(100, k / CAL_GOAL * 100)}%"></div></div>`;
 }
 
 /* ---------- Day view ---------- */
@@ -382,20 +405,32 @@ function renderDay() {
   }
 
   const g = getProtein(dk);
-  html += `<div class="section"><div class="label">Protein</div>
+  const k = getCal(dk);
+  html += `<div class="section"><div class="label">Food</div>
     <div class="card">
-      <div class="protein-top">
-        <div class="protein-num">${g}<small> / ${PROTEIN_GOAL}g</small></div>
-        <div class="sub">${g >= PROTEIN_GOAL ? '<span class="hit">Goal hit</span>' : `${PROTEIN_GOAL - g}g left`}</div>
+      <div class="nutri-row">
+        <div class="protein-top">
+          <div class="protein-num">${g}<small> / ${PROTEIN_GOAL}g protein</small></div>
+          <div class="sub">${g >= PROTEIN_GOAL ? '<span class="hit">Goal hit</span>' : `${PROTEIN_GOAL - g}g left`}</div>
+        </div>
+        ${proteinBar(g)}
       </div>
-      ${proteinBar(g)}
+      <div class="nutri-row">
+        <div class="protein-top">
+          <div class="cal-num">${k}<small> / ${CAL_GOAL} kcal</small></div>
+          <div class="sub">${k > CAL_GOAL ? `<span class="over">${k - CAL_GOAL} over</span>` : `${CAL_GOAL - k} left`}</div>
+        </div>
+        ${calBar(k)}
+      </div>
       <div class="chips">
-        ${MEALS.map(m => `<button class="chip" onclick="addProtein(${m.g})">${m.label} <b>+${m.g}</b></button>`).join('')}
+        ${MEALS.map(m => `<button class="chip" onclick="addFood(${m.g}, ${m.kcal})">${m.label} <b>+${m.g}g</b> <i>${m.kcal}</i></button>`).join('')}
       </div>
       <div class="protein-edit">
-        <input id="p-add" type="number" inputmode="numeric" placeholder="Add grams (use - to subtract)">
-        <button onclick="addProtein(Number(document.getElementById('p-add').value) || 0)">Add</button>
+        <input id="p-add" type="number" inputmode="numeric" placeholder="Protein g">
+        <input id="k-add" type="number" inputmode="numeric" placeholder="kcal">
+        <button onclick="addFood(Number(document.getElementById('p-add').value) || 0, Number(document.getElementById('k-add').value) || 0)">Add</button>
       </div>
+      <div class="sub" style="margin-top:6px">Use - to subtract</div>
     </div>
   </div>`;
 
@@ -415,13 +450,15 @@ function renderWeek() {
     <button onclick="shiftWeek(1)">&#8594;</button>
   </div>`;
 
-  let total = 0, logged = 0, hits = 0;
+  let total = 0, logged = 0, hits = 0, kTotal = 0, kLogged = 0;
   for (let i = 0; i < 7; i++) {
     const d = addDays(ws, i);
     const dk = ymd(d);
     const sched = SCHEDULE[DAYS[i]];
     const g = getProtein(dk);
+    const k = getCal(dk);
     if (g) { total += g; logged++; if (g >= PROTEIN_GOAL) hits++; }
+    if (k) { kTotal += k; kLogged++; }
 
     let detail = '';
     if (sched.exercises) {
@@ -435,13 +472,15 @@ function renderWeek() {
         <div class="name">${sched.title}</div>
         ${detail ? `<div class="sub">${detail}</div>` : ''}
       </div>
-      <div class="day-protein ${g >= PROTEIN_GOAL ? 'hit' : ''}">${g ? g + 'g' : '<span class="sub">-</span>'}${g ? proteinBar(g) : ''}</div>
+      <div class="day-protein ${g >= PROTEIN_GOAL ? 'hit' : ''}">${g ? g + 'g' : '<span class="sub">-</span>'}${g ? proteinBar(g) : ''}
+        ${k ? `<div class="sub ${k > CAL_GOAL ? 'over' : ''}" style="margin-top:4px">${k} kcal</div>` : ''}</div>
     </div>`;
   }
 
   html += `<div class="stats" style="margin-top:12px">
     <div class="card stat"><b>${logged ? Math.round(total / logged) : '-'}</b><span class="sub">avg g/day</span></div>
     <div class="card stat"><b>${hits}/7</b><span class="sub">days at goal</span></div>
+    <div class="card stat"><b>${kLogged ? Math.round(kTotal / kLogged) : '-'}</b><span class="sub">avg kcal/day</span></div>
   </div>`;
   return html;
 }
@@ -453,28 +492,32 @@ function renderProgress() {
   const daysIn = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
   const tk = ymd(today());
 
-  let total = 0, logged = 0, hits = 0;
+  let total = 0, logged = 0, hits = 0, kTotal = 0, kLogged = 0;
   let cells = DAY_SHORT.map(s => `<div class="dow">${s[0]}</div>`).join('');
   for (let i = 0; i < first.getDay(); i++) cells += `<div class="blank"></div>`;
   for (let day = 1; day <= daysIn; day++) {
     const d = new Date(m.getFullYear(), m.getMonth(), day);
     const dk = ymd(d);
     const g = getProtein(dk);
+    const k = getCal(dk);
     if (g) { total += g; logged++; if (g >= PROTEIN_GOAL) hits++; }
+    if (k) { kTotal += k; kLogged++; }
     cells += `<div class="cell ${g >= PROTEIN_GOAL ? 'hit' : ''} ${dk === tk ? 'today' : ''}" onclick="openDay('${dk}')">
       <div class="d">${day}</div><div class="g">${g || ''}</div>
+      ${k ? `<div class="k ${k > CAL_GOAL ? 'over' : ''}">${k}</div>` : ''}
     </div>`;
   }
 
   let html = `<div class="section">
     <div class="pager">
       <button onclick="shiftMonth(-1)">&#8592;</button>
-      <div class="label">Protein · ${MONTHS_FULL[m.getMonth()]} ${m.getFullYear()}</div>
+      <div class="label">Food · ${MONTHS_FULL[m.getMonth()]} ${m.getFullYear()}</div>
       <button onclick="shiftMonth(1)">&#8594;</button>
     </div>
     <div class="stats">
       <div class="card stat"><b>${logged ? Math.round(total / logged) : '-'}</b><span class="sub">avg g/day</span></div>
       <div class="card stat"><b>${hits}/${logged}</b><span class="sub">days at goal</span></div>
+      <div class="card stat"><b>${kLogged ? Math.round(kTotal / kLogged) : '-'}</b><span class="sub">avg kcal/day</span></div>
     </div>
     <div class="cal">${cells}</div>
   </div>`;
@@ -521,9 +564,10 @@ function onWeight(wk, key, val) {
   val = val.trim();
   setWeight(wk, key, val === '' ? null : Number(val));
 }
-function addProtein(g) {
+function addFood(g, kcal) {
   const dk = ymd(state.date);
   setProtein(dk, Math.max(0, getProtein(dk) + g));
+  setCal(dk, Math.max(0, getCal(dk) + kcal));
   render();
 }
 
