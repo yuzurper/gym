@@ -211,7 +211,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 14; // bump on every push
+const APP_VERSION = 15; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 2150; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -305,6 +305,117 @@ function load(key) {
 }
 function save(key, obj) {
   try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
+  queuePush();
+}
+
+/* ---------- Backup ---------- */
+// Cloud: each change goes to the gym-backup Worker (worker/index.js) after 3s.
+// The key comes from the link (#k=...) and is also kept in localStorage.
+// File: a JSON copy of every gym_ key, saved or restored by hand.
+const BACKUP_URL = 'https://gym-backup.yunz-msps.workers.dev/backup';
+const sync = { ready: false, timer: null, failed: false };
+
+// Sync bookkeeping uses the gymsync_ prefix so it is never backed up.
+function meta(k, v) {
+  try {
+    if (v === undefined) return localStorage.getItem('gymsync_' + k);
+    localStorage.setItem('gymsync_' + k, v);
+  } catch (e) { return null; }
+}
+function backupKey() {
+  const m = location.hash.match(/k=([\w-]+)/);
+  if (m) { meta('key', m[1]); return m[1]; }
+  return meta('key');
+}
+function snapshot() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('gym_')) data[k] = localStorage.getItem(k);
+  }
+  return { v: 1, savedAt: new Date().toISOString(), data };
+}
+function hasData(snap) {
+  return !!(snap && snap.data && Object.keys(snap.data).some(k => k !== 'gym_pbs_migrated'));
+}
+function applySnapshot(snap) {
+  Object.keys(snap.data).forEach(k => localStorage.setItem(k, snap.data[k]));
+}
+function queuePush() {
+  if (!sync.ready || !backupKey()) return;
+  clearTimeout(sync.timer);
+  sync.timer = setTimeout(pushBackup, 3000);
+}
+async function pushBackup() {
+  try {
+    const res = await fetch(BACKUP_URL, {
+      method: 'PUT',
+      headers: { 'X-Key': backupKey(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(snapshot())
+    });
+    if (!res.ok) throw new Error(res.status);
+    meta('cloud_at', new Date().toISOString());
+    sync.failed = false;
+  } catch (e) { sync.failed = true; }
+  renderFoot();
+}
+// On open: if this phone has no data, restore from the cloud first.
+// Pushes stay off until that check succeeds, so an empty phone never
+// overwrites a good backup.
+async function initSync() {
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  if (!backupKey()) { sync.ready = true; return; }
+  if (!hasData(snapshot())) {
+    try {
+      const res = await fetch(BACKUP_URL, { headers: { 'X-Key': backupKey() } });
+      if (!res.ok) throw new Error(res.status);
+      const snap = await res.json();
+      if (hasData(snap)) { applySnapshot(snap); render(); }
+    } catch (e) { sync.failed = true; renderFoot(); return; }
+  }
+  sync.ready = true;
+  if (hasData(snapshot())) pushBackup();
+}
+function ago(iso) {
+  if (!iso) return 'never';
+  const min = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min} min ago`;
+  if (min < 1440) return `${Math.round(min / 60)} h ago`;
+  return `${Math.round(min / 1440)} days ago`;
+}
+function cloudStatus() {
+  if (!backupKey()) return 'Cloud backup off';
+  if (sync.failed) return 'Cloud backup failed, will retry';
+  return `Backed up ${ago(meta('cloud_at'))}`;
+}
+async function backupFile() {
+  const name = `gym-backup-${ymd(today())}.json`;
+  const blob = new Blob([JSON.stringify(snapshot())], { type: 'application/json' });
+  try {
+    const file = new File([blob], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file] });
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+    }
+    meta('file_at', new Date().toISOString());
+    render();
+  } catch (e) {} // share sheet cancelled
+}
+function restoreFile(f) {
+  if (!f) return;
+  f.text().then(t => {
+    const snap = JSON.parse(t);
+    if (!hasData(snap)) { alert('That file has no gym data.'); return; }
+    if (!confirm(`Replace the data on this phone with the backup from ${String(snap.savedAt).slice(0, 10)}?`)) return;
+    applySnapshot(snap);
+    queuePush();
+    render();
+  }).catch(() => alert('Could not read that file.'));
 }
 
 /* ---------- Dates (local time) ---------- */
@@ -604,6 +715,18 @@ function renderProgress() {
     html += `</table></div>`;
   });
   html += `</div>`;
+
+  html += `<div class="section"><div class="label">Backup</div>
+    <div class="card">
+      <div class="sub">${cloudStatus()}</div>
+      <div class="sub">Backup file saved ${ago(meta('file_at'))}</div>
+      <div class="protein-edit">
+        <button style="flex:1;padding:9px" onclick="backupFile()">Save backup file</button>
+        <button style="flex:1;padding:9px" onclick="document.getElementById('restore-file').click()">Restore from file</button>
+      </div>
+      <input type="file" id="restore-file" accept="application/json,.json" style="display:none" onchange="restoreFile(this.files[0])">
+    </div>
+  </div>`;
   return html;
 }
 
@@ -656,7 +779,12 @@ function renderBodyProgress() {
 function render() {
   const body = state.view === 'week' ? renderWeek() : state.view === 'progress' ? renderProgress() : renderDay();
   document.getElementById('app').innerHTML = tabs() + body +
-    `<div class="sub" style="text-align:center;color:var(--dim);margin-top:24px">v${APP_VERSION}</div>`;
+    `<div id="foot" class="sub" style="text-align:center;color:var(--dim);margin-top:24px"></div>`;
+  renderFoot();
+}
+function renderFoot() {
+  const el = document.getElementById('foot');
+  if (el) el.textContent = `v${APP_VERSION} · ${cloudStatus()}`;
 }
 function go(view) {
   state.view = view;
@@ -685,6 +813,7 @@ function addFood(g, kcal) {
 }
 
 render();
+initSync();
 </script>
 
 </body>
