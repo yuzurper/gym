@@ -211,9 +211,10 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 13; // bump on every push
+const APP_VERSION = 14; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 2150; // daily limit, not a minimum
+const GOAL_WEIGHT = 160;
 
 const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
@@ -292,9 +293,11 @@ const MONTHS_FULL = ['January','February','March','April','May','June','July','A
 // gym_weights_v2: { "<week start YYYY-MM-DD>": { "<day>|<exercise>": lbs } }
 // gym_protein_v1: { "<YYYY-MM-DD>": grams }
 // gym_cal_v1: { "<YYYY-MM-DD>": kcal }
+// gym_body_v1: { "<YYYY-MM-DD>": lbs }
 const WEIGHTS_KEY = 'gym_weights_v2';
 const PROTEIN_KEY = 'gym_protein_v1';
 const CAL_KEY = 'gym_cal_v1';
+const BODY_KEY = 'gym_body_v1';
 
 function load(key) {
   try { return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -349,6 +352,22 @@ function setCal(dateKey, kcal) {
   save(CAL_KEY, all);
 }
 
+/* ---------- Body weight ---------- */
+function getBody(dateKey) { const v = load(BODY_KEY)[dateKey]; return v != null ? v : null; }
+function setBody(dateKey, lbs) {
+  const all = load(BODY_KEY);
+  if (lbs == null || isNaN(lbs)) delete all[dateKey]; else all[dateKey] = lbs;
+  save(BODY_KEY, all);
+}
+// Average of the weigh-ins in the week that starts on ws, or null.
+function weekAvg(ws) {
+  const vals = [];
+  for (let i = 0; i < 7; i++) { const v = getBody(ymd(addDays(ws, i))); if (v != null) vals.push(v); }
+  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+}
+function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+function change(n) { return (n > 0 ? '+' : '') + fmt1(n); }
+
 // One-time import of old PBs into the week each was logged.
 (function migratePBs() {
   const old = load('gym_pbs_v1');
@@ -397,6 +416,22 @@ function renderDay() {
 
   let html = `<div class="label">${isToday ? 'Today · ' : ''}${DAY_SHORT[d.getDay()]} ${short(d)}</div>
     <div class="title">${sched.title}</div>`;
+
+  const bw = getBody(dk);
+  const avg = weekAvg(weekStart(d));
+  const prevAvg = weekAvg(addDays(weekStart(d), -7));
+  html += `<div class="section"><div class="card row">
+    <div class="grow">
+      <div class="name">Morning weight</div>
+      <div class="sub">${avg != null ? `Week avg ${fmt1(avg)}${prevAvg != null ? ` (${change(avg - prevAvg)})` : ''} · ${fmt1(Math.max(0, avg - GOAL_WEIGHT))} to ${GOAL_WEIGHT}` : `After the bathroom, before food`}</div>
+    </div>
+    <label class="wt">
+      <input type="number" inputmode="decimal" step="0.1" min="0"
+        value="${bw != null ? bw : ''}" placeholder="-"
+        onchange="onBody('${dk}', this.value)">
+      <span>lb</span>
+    </label>
+  </div></div>`;
 
   if (sched.exercises) {
     html += `<div class="section"><div class="label">Lifts · week of ${short(weekStart(d))}</div>`;
@@ -503,6 +538,12 @@ function renderWeek() {
     <div class="card stat"><b>${hits}/7</b><span class="sub">days at goal</span></div>
     <div class="card stat"><b>${kLogged ? Math.round(kTotal / kLogged) : '-'}</b><span class="sub">avg kcal/day</span></div>
   </div>`;
+  const avg = weekAvg(ws);
+  const prevAvg = weekAvg(addDays(ws, -7));
+  html += `<div class="stats">
+    <div class="card stat"><b>${avg != null ? fmt1(avg) : '-'}</b><span class="sub">avg lb</span></div>
+    <div class="card stat"><b>${avg != null && prevAvg != null ? change(avg - prevAvg) : '-'}</b><span class="sub">vs last week</span></div>
+  </div>`;
   return html;
 }
 
@@ -529,7 +570,7 @@ function renderProgress() {
     </div>`;
   }
 
-  let html = `<div class="section">
+  let html = renderBodyProgress() + `<div class="section">
     <div class="pager">
       <button onclick="shiftMonth(-1)">&#8592;</button>
       <div class="label">Food · ${MONTHS_FULL[m.getMonth()]} ${m.getFullYear()}</div>
@@ -566,6 +607,51 @@ function renderProgress() {
   return html;
 }
 
+// Weekly averages for the last 8 weeks, with a pace check toward the goal.
+function renderBodyProgress() {
+  const weeks = [];
+  for (let i = 7; i >= 0; i--) {
+    const ws = addDays(weekStart(today()), -7 * i);
+    const avg = weekAvg(ws);
+    if (avg != null) weeks.push({ ws, avg });
+  }
+  let html = `<div class="section"><div class="label" style="margin-bottom:8px">Body weight · goal ${GOAL_WEIGHT} lb</div>`;
+  if (!weeks.length) {
+    return html + `<div class="card sub">Log your morning weight on the Today tab. Weekly averages show here.</div></div>`;
+  }
+
+  const all = load(BODY_KEY);
+  const firstKey = Object.keys(all).sort()[0];
+  const start = weekAvg(weekStart(parseYmd(firstKey)));
+  const cur = weeks[weeks.length - 1].avg;
+  html += `<div class="stats">
+    <div class="card stat"><b>${fmt1(cur)}</b><span class="sub">this week avg</span></div>
+    <div class="card stat"><b>${fmt1(Math.max(0, start - cur))}</b><span class="sub">lb lost</span></div>
+    <div class="card stat"><b>${fmt1(Math.max(0, cur - GOAL_WEIGHT))}</b><span class="sub">lb to go</span></div>
+  </div>`;
+
+  // Pace: compare the latest week to the week 3 weeks before it.
+  const latest = weeks[weeks.length - 1];
+  const old = weeks.find(w => ymd(w.ws) === ymd(addDays(latest.ws, -21)));
+  let pace = 'Pace check needs 4 weeks of weigh-ins.';
+  if (cur <= GOAL_WEIGHT) pace = '<span class="hit">Goal reached.</span>';
+  else if (old) {
+    const rate = (latest.avg - old.avg) / 3;
+    if (rate > -0.5) pace = `<span class="over">Slow: ${change(rate)} lb/week. Cut about 150 kcal a day.</span>`;
+    else if (rate < -2) pace = `<span class="over">Fast: ${change(rate)} lb/week. Add about 150 kcal a day to keep muscle.</span>`;
+    else pace = `<span class="hit">On track: ${change(rate)} lb/week.</span>`;
+  }
+  html += `<div class="card"><div class="sub">${pace}</div></div>`;
+
+  html += `<div class="card table-wrap"><table><tr><th>Week of</th><th>Avg lb</th><th>Change</th></tr>`;
+  weeks.slice().reverse().forEach((w, i, arr) => {
+    const prev = arr[i + 1] && ymd(arr[i + 1].ws) === ymd(addDays(w.ws, -7)) ? arr[i + 1].avg : null;
+    html += `<tr><td>${short(w.ws)}</td><td class="${i === 0 ? 'cur' : ''}">${fmt1(w.avg)}</td><td>${prev != null ? change(w.avg - prev) : '-'}</td></tr>`;
+  });
+  html += `</table></div></div>`;
+  return html;
+}
+
 /* ---------- Actions ---------- */
 function render() {
   const body = state.view === 'week' ? renderWeek() : state.view === 'progress' ? renderProgress() : renderDay();
@@ -585,6 +671,11 @@ function shiftMonth(n) { state.month = new Date(state.month.getFullYear(), state
 function onWeight(wk, key, val) {
   val = val.trim();
   setWeight(wk, key, val === '' ? null : Number(val));
+}
+function onBody(dk, val) {
+  val = val.trim();
+  setBody(dk, val === '' ? null : Number(val));
+  render();
 }
 function addFood(g, kcal) {
   const dk = ymd(state.date);
