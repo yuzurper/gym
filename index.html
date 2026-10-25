@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 24; // bump on every push
+const APP_VERSION = 25; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -589,6 +589,7 @@ function renderDay() {
         <div class="grow">
           <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}</div>
           <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}</div>
+          <div class="sub">Sets 1-${ex.sets - 1}: stop with 1-2 reps left · Set ${ex.sets}: to failure</div>
           ${ex.tip ? `<div class="sub" style="color:var(--dim)">${esc(ex.tip)}</div>` : ''}
         </div>
         <label class="wt">
@@ -599,7 +600,7 @@ function renderDay() {
         </label>
       </div>`;
     });
-    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. If one lift has an extra set, do it alone with 90s rest. Short on time? Skip C. Last set of each lift: go until you cannot do another rep. Other sets: stop 1-2 reps short. Hit the top reps on every set = add weight next week.</div></div>`;
+    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. If one lift has an extra set, do it alone with 90s rest. Short on time? Skip C. Hit the top reps on every set = add weight next week.</div></div>`;
   } else {
     html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
