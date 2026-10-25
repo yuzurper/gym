@@ -217,14 +217,15 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 26; // bump on every push
+const APP_VERSION = 27; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
 
 // Each lifting day is 3 supersets: exercises 1+2 are A, 3+4 are B, 5+6 are C.
 // Each pair works different muscles where the split allows, so one rests
-// while the other works. About 12-15 weekly sets per major muscle (Pelland 2025).
+// while the other works. Superset A is 4 sets, B and C are 3: about 13-14
+// weekly sets per major muscle (Pelland 2025).
 const T = {
   pullup: "Full hang at the bottom, chin over the bar. Under 5 reps? Use the lat pulldown.",
   lateral: "Light weight. Raise to shoulder height, slight bend in elbows.",
@@ -239,24 +240,24 @@ const T = {
 };
 const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
-    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max", tip: T.pullup },
-    { name: "Lateral Raises", sets: 3, reps: 15, tip: T.lateral },
+    { name: "Pull-ups / Chin-ups", sets: 4, reps: "Max", tip: T.pullup },
+    { name: "Lateral Raises", sets: 4, reps: 15, tip: T.lateral },
     { name: "Hammer-Grip Machine Row", sets: 3, reps: "8-10", tip: T.machineRow },
     { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: T.ezCurl },
     { name: "Face Pulls", sets: 3, reps: 15, tip: "Rope at face height. Pull to forehead, elbows high." },
     { name: "Hammer Curls", sets: 3, reps: 12, tip: "Dumbbells, thumbs up the whole time." }
   ]},
   monday: { title: "Push", exercises: [
-    { name: "DB Flat Press", sets: 3, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", tip: T.lateral },
+    { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
+    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral },
     { name: "Incline DB Press", sets: 3, reps: "8-10", tip: T.incline },
     { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12", tip: "Elbows pinned. Spread the rope apart at the bottom." },
     { name: "Cable Flyes", sets: 3, reps: "12-15", tip: "Pulleys at chest height. Slight bend in elbows, bring hands together in front." },
     { name: "DB Overhead Tricep Extension", sets: 3, reps: 12, tip: "One dumbbell in both hands overhead. Lower behind your head, elbows forward." }
   ]},
   tuesday: { title: "Legs", exercises: [
-    { name: "Leg Press", sets: 3, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
-    { name: "Leg Curls", sets: 3, reps: "10-12", tip: T.legCurl },
+    { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
+    { name: "Leg Curls", sets: 4, reps: "10-12", tip: T.legCurl },
     { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: T.rdl },
     { name: "Standing Calf Raises", sets: 3, reps: "12-15", tip: T.calf },
     { name: "Goblet Squats", sets: 3, reps: 10, tip: "Hold one dumbbell at your chest. Sit down between your heels." },
@@ -264,16 +265,16 @@ const SCHEDULE = {
   ]},
   wednesday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] },
   thursday: { title: "Upper", exercises: [
-    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: T.incline },
-    { name: "Lat Pulldowns", sets: 3, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little." },
+    { name: "Incline DB Press", sets: 4, reps: "8-10", tip: T.incline },
+    { name: "Lat Pulldowns", sets: 4, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little." },
     { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10", tip: "Bench upright. Press straight overhead." },
     { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: T.machineRow },
     { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: T.ohCable },
     { name: "EZ Bar Curls", sets: 3, reps: 12, tip: T.ezCurl }
   ]},
   friday: { title: "Lower + Core", exercises: [
-    { name: "Walking Lunges", sets: 3, reps: "10/leg", tip: "Dumbbells at sides. Long steps, back knee near the floor." },
-    { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: T.knee },
+    { name: "Walking Lunges", sets: 4, reps: "10/leg", tip: "Dumbbells at sides. Long steps, back knee near the floor." },
+    { name: "Hanging Knee Raises", sets: 4, reps: "12-15", tip: T.knee },
     { name: "Leg Extensions", sets: 3, reps: "12-15", tip: "1 second squeeze at the top, return slowly." },
     { name: "Leg Curls", sets: 3, reps: 12, tip: T.legCurl },
     { name: "Dumbbell RDLs", sets: 3, reps: 8, tip: T.rdl },
@@ -579,7 +580,7 @@ function renderDay() {
 
   if (sched.exercises) {
     html += `<div class="section"><div class="label">Lifts · week of ${short(weekStart(d))}</div>
-      <div class="sub" style="margin:4px 0 8px">Sets 1-2: stop with 1-2 reps left. Set 3: to failure.</div>`;
+      <div class="sub" style="margin:4px 0 8px">Every set: stop with 1-2 reps left, except the last set of each lift: go to failure. Superset A is 4 sets, B and C are 3.</div>`;
     sched.exercises.forEach((ex, i) => {
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
