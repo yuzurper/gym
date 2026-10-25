@@ -217,44 +217,67 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 23; // bump on every push
+const APP_VERSION = 24; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
 
-// Each lifting day is 2 supersets: exercises 1+2 are A, 3+4 are B.
-// Each pair works different muscles so one rests while the other works.
+// Each lifting day is 3 supersets: exercises 1+2 are A, 3+4 are B, 5+6 are C.
+// Each pair works different muscles where the split allows, so one rests
+// while the other works. About 12-15 weekly sets per major muscle (Pelland 2025).
+const T = {
+  pullup: "Full hang at the bottom, chin over the bar. Under 5 reps? Use the lat pulldown.",
+  lateral: "Light weight. Raise to shoulder height, slight bend in elbows.",
+  machineRow: "Chest on the pad. Pull elbows back, squeeze shoulder blades.",
+  ezCurl: "Elbows pinned to your sides. No swinging.",
+  incline: "Bench at about 30 degrees. Press up over your upper chest.",
+  rdl: "Push hips back, flat back. Stop at a strong hamstring stretch.",
+  legCurl: "Squeeze hard, return slowly.",
+  calf: "Full stretch at the bottom, 1 second pause at the top.",
+  knee: "Pull-up bar. Knees to chest, no swinging.",
+  ohCable: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head."
+};
 const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
-    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max", tip: "Full hang at the bottom, chin over the bar. Under 5 reps? Use the lat pulldown." },
-    { name: "Lateral Raises", sets: 3, reps: 15, tip: "Light weight. Raise to shoulder height, slight bend in elbows." },
-    { name: "Hammer-Grip Machine Row", sets: 4, reps: "8-10", tip: "Chest on the pad. Pull elbows back, squeeze shoulder blades." },
-    { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: "Elbows pinned to your sides. No swinging." }
+    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max", tip: T.pullup },
+    { name: "Lateral Raises", sets: 3, reps: 15, tip: T.lateral },
+    { name: "Hammer-Grip Machine Row", sets: 4, reps: "8-10", tip: T.machineRow },
+    { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: T.ezCurl },
+    { name: "Face Pulls", sets: 3, reps: 15, tip: "Rope at face height. Pull to forehead, elbows high." },
+    { name: "Hammer Curls", sets: 3, reps: 12, tip: "Dumbbells, thumbs up the whole time." }
   ]},
   monday: { title: "Push", exercises: [
     { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
-    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: "Light weight. Raise to shoulder height, slight bend in elbows." },
-    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: "Bench at about 30 degrees. Press up over your upper chest." },
-    { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12", tip: "Elbows pinned. Spread the rope apart at the bottom." }
+    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral },
+    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: T.incline },
+    { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12", tip: "Elbows pinned. Spread the rope apart at the bottom." },
+    { name: "Cable Flyes", sets: 3, reps: "12-15", tip: "Pulleys at chest height. Slight bend in elbows, bring hands together in front." },
+    { name: "DB Overhead Tricep Extension", sets: 3, reps: 12, tip: "One dumbbell in both hands overhead. Lower behind your head, elbows forward." }
   ]},
   tuesday: { title: "Legs", exercises: [
     { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
-    { name: "Leg Curls", sets: 3, reps: "10-12", tip: "Squeeze hard, return slowly." },
-    { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: "Push hips back, flat back. Stop at a strong hamstring stretch." },
-    { name: "Standing Calf Raises", sets: 4, reps: "12-15", tip: "Full stretch at the bottom, 1 second pause at the top." }
+    { name: "Leg Curls", sets: 3, reps: "10-12", tip: T.legCurl },
+    { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: T.rdl },
+    { name: "Standing Calf Raises", sets: 4, reps: "12-15", tip: T.calf },
+    { name: "Goblet Squats", sets: 3, reps: 10, tip: "Hold one dumbbell at your chest. Sit down between your heels." },
+    { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: T.knee }
   ]},
   wednesday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] },
   thursday: { title: "Upper", exercises: [
-    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: "Bench at about 30 degrees. Press up over your upper chest." },
+    { name: "Incline DB Press", sets: 3, reps: "8-10", tip: T.incline },
     { name: "Lat Pulldowns", sets: 3, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little." },
-    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head." },
-    { name: "EZ Bar Curls", sets: 3, reps: 12, tip: "Elbows pinned to your sides. No swinging." }
+    { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10", tip: "Bench upright. Press straight overhead." },
+    { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: T.machineRow },
+    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: T.ohCable },
+    { name: "EZ Bar Curls", sets: 3, reps: 12, tip: T.ezCurl }
   ]},
   friday: { title: "Lower + Core", exercises: [
     { name: "Walking Lunges", sets: 3, reps: "10/leg", tip: "Dumbbells at sides. Long steps, back knee near the floor." },
-    { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: "Pull-up bar. Knees to chest, no swinging." },
+    { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: T.knee },
     { name: "Leg Extensions", sets: 3, reps: "12-15", tip: "1 second squeeze at the top, return slowly." },
-    { name: "Leg Curls", sets: 3, reps: 12, tip: "Squeeze hard, return slowly." }
+    { name: "Leg Curls", sets: 3, reps: 12, tip: T.legCurl },
+    { name: "Dumbbell RDLs", sets: 3, reps: 8, tip: T.rdl },
+    { name: "Standing Calf Raises", sets: 3, reps: 15, tip: T.calf }
   ]},
   saturday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] }
 };
@@ -560,7 +583,7 @@ function renderDay() {
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
       const prev = lastWeight(wk, key);
-      const pair = (i < 2 ? 'A' : 'B') + (i % 2 + 1);
+      const pair = 'ABC'[Math.floor(i / 2)] + (i % 2 + 1);
       if (i % 2 === 0) html += `<div class="label" style="margin:${i ? 14 : 4}px 0 6px">Superset ${pair[0]}</div>`;
       html += `<div class="card row">
         <div class="grow">
@@ -576,7 +599,7 @@ function renderDay() {
         </label>
       </div>`;
     });
-    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B the same way. Last set of each lift: go until you cannot do another rep. Other sets: stop 1-2 reps short. Hit the top reps on every set = add weight next week.</div></div>`;
+    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. If one lift has an extra set, do it alone with 90s rest. Short on time? Skip C. Last set of each lift: go until you cannot do another rep. Other sets: stop 1-2 reps short. Hit the top reps on every set = add weight next week.</div></div>`;
   } else {
     html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
@@ -794,7 +817,7 @@ function renderBodyProgress() {
   else if (old) {
     const rate = (latest.avg - old.avg) / 3;
     if (rate > -0.5) pace = `<span class="over">Slow: ${change(rate)} lb/week. Cut about 150 kcal a day.</span>`;
-    else if (rate < -2) pace = `<span class="over">Fast: ${change(rate)} lb/week. Add about 150 kcal a day to keep muscle.</span>`;
+    else if (rate < -0.01 * latest.avg) pace = `<span class="over">Fast: ${change(rate)} lb/week (over 1% of body weight). Add about 150 kcal a day to keep muscle.</span>`;
     else pace = `<span class="hit">On track: ${change(rate)} lb/week.</span>`;
   }
   html += `<div class="card"><div class="sub">${pace}</div></div>`;
