@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 25; // bump on every push
+const APP_VERSION = 26; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -241,24 +241,24 @@ const SCHEDULE = {
   sunday: { title: "Pull", exercises: [
     { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max", tip: T.pullup },
     { name: "Lateral Raises", sets: 3, reps: 15, tip: T.lateral },
-    { name: "Hammer-Grip Machine Row", sets: 4, reps: "8-10", tip: T.machineRow },
+    { name: "Hammer-Grip Machine Row", sets: 3, reps: "8-10", tip: T.machineRow },
     { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: T.ezCurl },
     { name: "Face Pulls", sets: 3, reps: 15, tip: "Rope at face height. Pull to forehead, elbows high." },
     { name: "Hammer Curls", sets: 3, reps: 12, tip: "Dumbbells, thumbs up the whole time." }
   ]},
   monday: { title: "Push", exercises: [
-    { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
-    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral },
+    { name: "DB Flat Press", sets: 3, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", tip: T.lateral },
     { name: "Incline DB Press", sets: 3, reps: "8-10", tip: T.incline },
     { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12", tip: "Elbows pinned. Spread the rope apart at the bottom." },
     { name: "Cable Flyes", sets: 3, reps: "12-15", tip: "Pulleys at chest height. Slight bend in elbows, bring hands together in front." },
     { name: "DB Overhead Tricep Extension", sets: 3, reps: 12, tip: "One dumbbell in both hands overhead. Lower behind your head, elbows forward." }
   ]},
   tuesday: { title: "Legs", exercises: [
-    { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
+    { name: "Leg Press", sets: 3, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
     { name: "Leg Curls", sets: 3, reps: "10-12", tip: T.legCurl },
     { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: T.rdl },
-    { name: "Standing Calf Raises", sets: 4, reps: "12-15", tip: T.calf },
+    { name: "Standing Calf Raises", sets: 3, reps: "12-15", tip: T.calf },
     { name: "Goblet Squats", sets: 3, reps: 10, tip: "Hold one dumbbell at your chest. Sit down between your heels." },
     { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: T.knee }
   ]},
@@ -578,7 +578,8 @@ function renderDay() {
   </div></div>`;
 
   if (sched.exercises) {
-    html += `<div class="section"><div class="label">Lifts · week of ${short(weekStart(d))}</div>`;
+    html += `<div class="section"><div class="label">Lifts · week of ${short(weekStart(d))}</div>
+      <div class="sub" style="margin:4px 0 8px">Sets 1-2: stop with 1-2 reps left. Set 3: to failure.</div>`;
     sched.exercises.forEach((ex, i) => {
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
@@ -589,7 +590,6 @@ function renderDay() {
         <div class="grow">
           <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}</div>
           <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}</div>
-          <div class="sub">Sets 1-${ex.sets - 1}: stop with 1-2 reps left · Set ${ex.sets}: to failure</div>
           ${ex.tip ? `<div class="sub" style="color:var(--dim)">${esc(ex.tip)}</div>` : ''}
         </div>
         <label class="wt">
@@ -600,7 +600,7 @@ function renderDay() {
         </label>
       </div>`;
     });
-    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. If one lift has an extra set, do it alone with 90s rest. Short on time? Skip C. Hit the top reps on every set = add weight next week.</div></div>`;
+    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. Short on time? Skip C. Hit the top reps on every set = add weight next week.</div></div>`;
   } else {
     html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
