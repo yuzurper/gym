@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 28; // bump on every push
+const APP_VERSION = 29; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -305,7 +305,7 @@ const FILLERS = [
   { label: "Sourdough toast (1 slice)", g: 4, kcal: 100 },
   { label: "Egg", g: 6, kcal: 70 },
   { label: "Peanut butter (1 tbsp)", g: 4, kcal: 95 },
-  { label: "Cream cheese (1 tbsp)", g: 1, kcal: 50 }
+  { label: "Cream cheese (2 tbsp)", g: 1, kcal: 50 }
 ].sort(byLabel);
 function chip(m) {
   return `<button class="chip" onclick="addFood(${m.g}, ${m.kcal}, '${esc(m.label).replace(/'/g, "\\'")}')">${m.label} ${m.g ? `<b>+${m.g}g</b> ` : ''}<i>${m.kcal}</i></button>`;
