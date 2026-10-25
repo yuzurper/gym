@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 30; // bump on every push
+const APP_VERSION = 31; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -292,8 +292,8 @@ const MEALS = [
   { label: "Tuna can", g: 25, kcal: 110 },
   { label: "Fairlife milk (1 cup)", g: 13, kcal: 140 },
   { label: "Bagel sandwich (turkey bacon, egg, cheese)", g: 45, kcal: 850 },
-  { label: "Cottage cheese (200g)", g: 20, kcal: 150 },
-  { label: "Greek yogurt (0%, 170g)", g: 15, kcal: 110 }
+  { label: "Cottage cheese (1/2 cup)", g: 13, kcal: 100 },
+  { label: "Greek yogurt (0%, 3/4 cup)", g: 16, kcal: 90 }
 ].sort(byLabel);
 // Calorie fillers
 const FILLERS = [
@@ -303,7 +303,7 @@ const FILLERS = [
   { label: "Apple", g: 0, kcal: 95 },
   { label: "Sourdough toast (1 slice)", g: 4, kcal: 100 },
   { label: "Egg", g: 6, kcal: 70 },
-  { label: "Peanut butter (1 tbsp)", g: 4, kcal: 95 },
+  { label: "Peanut butter (2 tbsp)", g: 7, kcal: 190 },
   { label: "Cream cheese (2 tbsp)", g: 1, kcal: 50 }
 ].sort(byLabel);
 function chip(m) {
