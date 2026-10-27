@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 34; // bump on every push
+const APP_VERSION = 35; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -641,7 +641,6 @@ function renderDay() {
         <input id="k-add" type="number" inputmode="numeric" placeholder="kcal">
         <button onclick="addFood(Number(document.getElementById('p-add').value) || 0, Number(document.getElementById('k-add').value) || 0, document.getElementById('n-add').value.trim())">Add</button>
       </div>
-      <div class="sub" style="margin-top:6px">Use - to subtract</div>
     </div>
   </div>`;
 
