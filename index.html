@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 39; // bump on every push
+const APP_VERSION = 40; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -234,7 +234,7 @@ const T = {
   incline: "Bench at about 30 degrees. Press up over your upper chest.",
   rdl: "Push hips back, flat back. Stop at a strong hamstring stretch.",
   legCurl: "Squeeze hard, return slowly.",
-  calf: "Full stretch at the bottom, 1 second pause at the top.",
+  calf: "Seat on the leg press, balls of feet on the bottom edge, knees straight. Let heels drop for a full stretch, push up, 1 second pause at the top.",
   knee: "Pull-up bar. Knees to chest, no swinging.",
   ohCable: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head."
 };
@@ -259,7 +259,7 @@ const SCHEDULE = {
     { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
     { name: "Leg Curls", sets: 4, reps: "10-12", tip: T.legCurl },
     { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: T.rdl },
-    { name: "Standing Calf Raises", sets: 3, reps: "12-15", tip: T.calf },
+    { name: "Leg Press Calf Raises", sets: 3, reps: "12-15", tip: T.calf },
     { name: "Goblet Squats", sets: 3, reps: 10, tip: "Hold one dumbbell at your chest. Sit down between your heels." },
     { name: "Hanging Knee Raises", sets: 3, reps: "12-15", tip: T.knee }
   ]},
@@ -278,7 +278,7 @@ const SCHEDULE = {
     { name: "Leg Extensions", sets: 3, reps: "12-15", tip: "1 second squeeze at the top, return slowly." },
     { name: "Leg Curls", sets: 3, reps: 12, tip: T.legCurl },
     { name: "Dumbbell RDLs", sets: 3, reps: 8, tip: T.rdl },
-    { name: "Standing Calf Raises", sets: 3, reps: 15, tip: T.calf }
+    { name: "Leg Press Calf Raises", sets: 3, reps: 15, tip: T.calf }
   ]},
   saturday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] }
 };
@@ -552,6 +552,16 @@ function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
 function change(n) { return (n > 0 ? '+' : '') + fmt1(n); }
 
 // One-time import of old PBs into the week each was logged.
+// Weights logged under the old calf name move to the new one.
+(function renameCalf() {
+  const all = load(WEIGHTS_KEY);
+  let moved = false;
+  Object.values(all).forEach(wk => ['tuesday', 'friday'].forEach(day => {
+    const a = liftKey(day, 'Standing Calf Raises'), b = liftKey(day, 'Leg Press Calf Raises');
+    if (a in wk) { if (wk[b] == null) wk[b] = wk[a]; delete wk[a]; moved = true; }
+  }));
+  if (moved) save(WEIGHTS_KEY, all);
+})();
 (function migratePBs() {
   const old = load('gym_pbs_v1');
   if (!Object.keys(old).length || localStorage.getItem('gym_pbs_migrated')) return;
