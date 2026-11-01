@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 41; // bump on every push
+const APP_VERSION = 42; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -230,7 +230,7 @@ const T = {
   pullup: "Full hang at the bottom, chin over the bar. Under 5 reps? Use the lat pulldown.",
   lateral: "Light weight. Raise to shoulder height, slight bend in elbows.",
   machineRow: "Chest on the pad. Pull elbows back, squeeze shoulder blades.",
-  ezCurl: "Elbows pinned to your sides. No swinging.",
+  ropeCurl: "Rope on a low pulley. Elbows pinned to your sides, curl up and pull the rope ends apart at the top. No swinging.",
   incline: "Bench at about 30 degrees. Press up over your upper chest.",
   rdl: "Push hips back, flat back. Stop at a strong hamstring stretch.",
   legCurl: "Squeeze hard, return slowly.",
@@ -243,7 +243,7 @@ const SCHEDULE = {
     { name: "Pull-ups / Chin-ups", sets: 4, reps: "Max", tip: T.pullup },
     { name: "Lateral Raises", sets: 4, reps: 15, tip: T.lateral },
     { name: "Hammer-Grip Machine Row", sets: 3, reps: "8-10", tip: T.machineRow },
-    { name: "EZ Bar Curls", sets: 3, reps: "10-12", tip: T.ezCurl },
+    { name: "Rope Cable Curls", sets: 3, reps: "10-12", tip: T.ropeCurl },
     { name: "Rear Delt Machine", sets: 3, reps: 15, tip: "Pec Fly/Rear Delt machine, face the pad. Handles at shoulder height, sweep arms back, squeeze 1s." },
     { name: "Hammer Curls", sets: 3, reps: 12, tip: "Dumbbells, thumbs up the whole time." }
   ]},
@@ -270,7 +270,7 @@ const SCHEDULE = {
     { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10", tip: "Bench upright. Press straight overhead." },
     { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: T.machineRow },
     { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: T.ohCable },
-    { name: "EZ Bar Curls", sets: 3, reps: 12, tip: T.ezCurl }
+    { name: "Rope Cable Curls", sets: 3, reps: 12, tip: T.ropeCurl }
   ]},
   friday: { title: "Lower + Core", exercises: [
     { name: "Walking Lunges", sets: 4, reps: "10/leg", tip: "Dumbbells at sides. Long steps, back knee near the floor." },
@@ -550,12 +550,18 @@ function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
 function change(n) { return (n > 0 ? '+' : '') + fmt1(n); }
 
 // One-time import of old PBs into the week each was logged.
-// Weights logged under the old calf name move to the new one.
-(function renameCalf() {
+// Weights logged under an old lift name move to the new name.
+(function renameLifts() {
+  const renames = [
+    ['tuesday', 'Standing Calf Raises', 'Leg Press Calf Raises'],
+    ['friday', 'Standing Calf Raises', 'Leg Press Calf Raises'],
+    ['sunday', 'EZ Bar Curls', 'Rope Cable Curls'],
+    ['thursday', 'EZ Bar Curls', 'Rope Cable Curls']
+  ];
   const all = load(WEIGHTS_KEY);
   let moved = false;
-  Object.values(all).forEach(wk => ['tuesday', 'friday'].forEach(day => {
-    const a = liftKey(day, 'Standing Calf Raises'), b = liftKey(day, 'Leg Press Calf Raises');
+  Object.values(all).forEach(wk => renames.forEach(([day, from, to]) => {
+    const a = liftKey(day, from), b = liftKey(day, to);
     if (a in wk) { if (wk[b] == null) wk[b] = wk[a]; delete wk[a]; moved = true; }
   }));
   if (moved) save(WEIGHTS_KEY, all);
