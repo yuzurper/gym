@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 48; // bump on every push
+const APP_VERSION = 49; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -233,7 +233,7 @@ const T = {
   lateral: "Light weight. Raise to shoulder height, slight bend in elbows.",
   machineRow: "Chest on the pad. Pull elbows back, squeeze shoulder blades.",
   ropeCurl: "Rope on a low pulley. Elbows pinned to your sides, curl up and pull the rope ends apart at the top. No swinging.",
-  incline: "Bench at about 30 degrees between the two cable towers. Pulleys at the lowest setting, D-handles. Press up and slightly in over your upper chest.",
+  incline: "Stand between the towers, pulleys at the lowest setting, D-handles. One foot forward, lean slightly forward. Press up and in to eye level, hands meet in front. Slow on the way back.",
   rdl: "Push hips back, flat back. Stop at a strong hamstring stretch.",
   legCurl: "Squeeze hard, return slowly.",
   calf: "Seat on the leg press, balls of feet on the bottom edge, knees straight. Let heels drop for a full stretch, push up, 1 second pause at the top.",
@@ -252,7 +252,7 @@ const SCHEDULE = {
   monday: { title: "Push", exercises: [
     { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
     { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral },
-    { name: "Incline Cable Press", sets: 3, reps: "8-10", tip: T.incline },
+    { name: "Standing Low-to-High Cable Press", sets: 3, reps: "10-12", tip: T.incline },
     { name: "Tricep Rope Pushdowns", sets: 3, reps: "10-12", tip: "Elbows pinned. Spread the rope apart at the bottom." },
     { name: "Pec Fly Machine", sets: 3, reps: "12-15", tip: "Back on the pad, handles at chest height. Slight bend in elbows, bring hands together, squeeze 1s." },
     { name: "DB Overhead Tricep Extension", sets: 3, reps: 12, tip: "One dumbbell in both hands overhead. Lower behind your head, elbows forward." }
@@ -267,7 +267,7 @@ const SCHEDULE = {
   ]},
   wednesday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] },
   thursday: { title: "Upper", exercises: [
-    { name: "Incline Cable Press", sets: 4, reps: "8-10", tip: T.incline },
+    { name: "Standing Low-to-High Cable Press", sets: 4, reps: "10-12", tip: T.incline },
     { name: "Lat Pulldowns", sets: 4, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little." },
     { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10", tip: "Bench upright. Press straight overhead." },
     { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: T.machineRow },
