@@ -98,6 +98,15 @@
     .wt input:focus { outline: none; }
     .wt input::placeholder { color: var(--dim); font-weight: 500; }
     .wt span { font-size: 11px; color: var(--muted); }
+    .reps { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+    .reps span { font-size: 11px; color: var(--muted); width: 32px; }
+    .reps input {
+      flex: 1; min-width: 0; max-width: 56px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-size: 15px; font-weight: 700; padding: 6px 4px; text-align: center;
+    }
+    .reps input:focus { outline: none; border-color: var(--accent); }
+    .reps input::placeholder { color: var(--dim); font-weight: 500; }
 
     /* Protein */
     .protein-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
@@ -217,7 +226,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 50; // bump on every push
+const APP_VERSION = 51; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -324,6 +333,7 @@ const MONTHS_FULL = ['January','February','March','April','May','June','July','A
 // gym_weights_v2: { "<week start YYYY-MM-DD>": { "<day>|<exercise>": lbs } }
 // gym_protein_v1: { "<YYYY-MM-DD>": grams }
 // gym_cal_v1: { "<YYYY-MM-DD>": kcal }
+// gym_reps_v1: { "<week start>": { "<day>|<exercise>": [reps per set] } }
 // gym_body_v1: { "<YYYY-MM-DD>": lbs }
 // gym_foodlog_v1: { "<YYYY-MM-DD>": [{ label, g, kcal, at }] }
 const WEIGHTS_KEY = 'gym_weights_v2';
@@ -331,6 +341,7 @@ const PROTEIN_KEY = 'gym_protein_v1';
 const CAL_KEY = 'gym_cal_v1';
 const BODY_KEY = 'gym_body_v1';
 const FOODLOG_KEY = 'gym_foodlog_v1';
+const REPS_KEY = 'gym_reps_v1';
 
 function load(key) {
   try { return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -480,6 +491,32 @@ function lastWeight(weekKey, key) {
   const weeks = Object.keys(all).filter(w => w < weekKey).sort().reverse();
   for (const w of weeks) if (all[w][key] != null) return all[w][key];
   return null;
+}
+
+function getReps(weekKey, key) {
+  const w = load(REPS_KEY)[weekKey];
+  return (w && w[key]) || [];
+}
+function setRep(weekKey, key, set, val) {
+  const all = load(REPS_KEY);
+  all[weekKey] = all[weekKey] || {};
+  const r = all[weekKey][key] || [];
+  r[set] = val;
+  while (r.length && r[r.length - 1] == null) r.pop();
+  if (r.length) all[weekKey][key] = r; else delete all[weekKey][key];
+  save(REPS_KEY, all);
+}
+// Reps from the most recent earlier week that has any.
+function lastReps(weekKey, key) {
+  const all = load(REPS_KEY);
+  const weeks = Object.keys(all).filter(w => w < weekKey).sort().reverse();
+  for (const w of weeks) if (all[w][key]) return all[w][key];
+  return [];
+}
+// Top of the rep range: "8-10" -> 10, 15 -> 15, "10/leg" -> 10, "Max" -> null.
+function topReps(reps) {
+  const m = String(reps).match(/(\d+)(?!.*\d)/);
+  return m ? Number(m[1]) : null;
 }
 
 /* ---------- Protein ---------- */
@@ -656,12 +693,16 @@ function renderDay() {
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
       const prev = lastWeight(wk, key);
+      const reps = getReps(wk, key);
+      const prevReps = lastReps(wk, key);
+      const top = topReps(ex.reps);
+      const addWt = top && prevReps.length >= ex.sets && prevReps.slice(0, ex.sets).every(r => r >= top);
       const pair = 'ABC'[Math.floor(i / 2)] + (i % 2 + 1);
       if (i % 2 === 0) html += `<div class="label" style="margin:${i ? 14 : 4}px 0 6px">Superset ${pair[0]}</div>`;
-      html += `<div class="card row">
+      html += `<div class="card"><div class="row">
         <div class="grow">
           <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}</div>
-          <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}</div>
+          <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}${prevReps.length ? ` × ${prevReps.map(r => r == null ? '-' : r).join(', ')}` : ''}${addWt ? ' · <span class="hit">add weight</span>' : ''}</div>
           ${ex.tip ? `<div class="sub" style="color:var(--dim)">${esc(ex.tip)}</div>` : ''}
         </div>
         <label class="wt">
@@ -670,9 +711,12 @@ function renderDay() {
             onchange="onWeight('${wk}', '${esc(key).replace(/'/g, "\\'")}', this.value)">
           <span>lb</span>
         </label>
-      </div>`;
+      </div>
+      <div class="reps"><span>Reps</span>${Array.from({ length: ex.sets }, (_, s) => `<input type="number" inputmode="numeric" min="0"
+          value="${reps[s] != null ? reps[s] : ''}" placeholder="${prevReps[s] != null ? prevReps[s] : '-'}"
+          onchange="onRep('${wk}', '${esc(key).replace(/'/g, "\\'")}', ${s}, this.value)">`).join('')}</div></div>`;
     });
-    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. Short on time? Skip C. Hit the top reps on every set = add weight next week.</div></div>`;
+    html += `<div class="sub" style="margin-top:6px">Do A1, then A2, rest 60-90s, and repeat until all sets are done. Then do B and C the same way. Short on time? Skip C. Log reps for each set. Hit the top reps on every set = add weight next week (the app shows "add weight").</div></div>`;
   } else {
     html += `<div class="section">${sched.activities.map(a => `<div class="card name">${a}</div>`).join('')}</div>`;
   }
@@ -921,6 +965,10 @@ function shiftMonth(n) { state.month = new Date(state.month.getFullYear(), state
 function onWeight(wk, key, val) {
   val = val.trim();
   setWeight(wk, key, val === '' ? null : Number(val));
+}
+function onRep(wk, key, set, val) {
+  val = val.trim();
+  setRep(wk, key, set, val === '' ? null : Number(val));
 }
 function onBody(dk, val) {
   val = val.trim();
