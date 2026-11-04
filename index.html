@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 53; // bump on every push
+const APP_VERSION = 54; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -309,7 +309,8 @@ const FILLERS = [
   { label: "Baby carrots (3 oz)", g: 1, kcal: 35 },
   { label: "LesserEvil popcorn (3 cups)", g: 2, kcal: 130 },
   { label: "Peanut butter (2 tbsp)", g: 7, kcal: 190 },
-  { label: "Cream cheese (2 tbsp)", g: 1, kcal: 50 }
+  { label: "Cream cheese (2 tbsp)", g: 1, kcal: 50 },
+  { label: "Milano + peanut butter (18g)", g: 5, kcal: 165 }
 ].sort(byLabel);
 function chip(m) {
   return `<button class="chip" onclick="addFood(${m.g}, ${m.kcal}, '${esc(m.label).replace(/'/g, "\\'")}')">${m.label} ${m.g ? `<b>+${m.g}g</b> ` : ''}<i>${m.kcal}</i></button>`;
