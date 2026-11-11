@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 56; // bump on every push
+const APP_VERSION = 57; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -288,29 +288,30 @@ const SCHEDULE = {
 // Quick-add buttons: g = protein, kcal = calories. Each row shows sorted by name.
 const byLabel = (a, b) => a.label.localeCompare(b.label);
 const MEALS = [
-  { label: "Protein Powder (2 scoops)", g: 50, kcal: 240 },
-  { label: "Chicken/Beef (1 cup)", g: 40, kcal: 250 },
-  { label: "Protein Seltzer", g: 30, kcal: 130 },
+  { label: "Protein Powder (2 scoops, ~62g)", g: 50, kcal: 240 },
+  { label: "Chicken breast (100g cooked)", g: 30, kcal: 165 },
+  { label: "Beef, 90% lean (100g cooked)", g: 26, kcal: 215 },
+  { label: "Protein Seltzer (1 can)", g: 30, kcal: 130 },
   { label: "Chipotle High Protein High Fiber bowl", g: 46, kcal: 540 },
-  { label: "Quest chips (1 bag)", g: 18, kcal: 150 },
-  { label: "Protein bar (Pure Protein)", g: 21, kcal: 200 },
-  { label: "Tuna can", g: 25, kcal: 110 },
-  { label: "Fairlife milk (1 cup)", g: 13, kcal: 140 },
-  { label: "Cottage cheese (1/2 cup)", g: 13, kcal: 100 },
-  { label: "Greek yogurt (0%, 3/4 cup)", g: 16, kcal: 90 }
+  { label: "Quest chips (1 bag, 32g)", g: 18, kcal: 150 },
+  { label: "Protein bar (Pure Protein, 50g)", g: 21, kcal: 200 },
+  { label: "Tuna (1 can, drained)", g: 25, kcal: 110 },
+  { label: "Fairlife milk (1 cup, 240ml)", g: 13, kcal: 140 },
+  { label: "Cottage cheese (1/2 cup, 113g)", g: 13, kcal: 100 },
+  { label: "Greek yogurt (0%, 3/4 cup, 170g)", g: 16, kcal: 90 }
 ].sort(byLabel);
 // Calorie fillers
 const FILLERS = [
-  { label: "Rice (1 cup cooked)", g: 4, kcal: 205 },
-  { label: "Rice Krispies Treat", g: 1, kcal: 90 },
-  { label: "Banana", g: 1, kcal: 105 },
-  { label: "Apple", g: 0, kcal: 95 },
+  { label: "Rice (1 cup cooked, 158g)", g: 4, kcal: 205 },
+  { label: "Rice Krispies Treat (22g)", g: 1, kcal: 90 },
+  { label: "Banana (medium, 118g)", g: 1, kcal: 105 },
+  { label: "Apple (medium, 182g)", g: 0, kcal: 95 },
   { label: "Sourdough toast (1 slice)", g: 4, kcal: 100 },
-  { label: "Egg", g: 6, kcal: 70 },
-  { label: "Baby carrots (bowl, 9 oz)", g: 3, kcal: 105 },
-  { label: "LesserEvil popcorn (3 cups)", g: 2, kcal: 130 },
-  { label: "Peanut butter (2 tbsp)", g: 7, kcal: 190 },
-  { label: "Cream cheese (2 tbsp)", g: 1, kcal: 50 },
+  { label: "Egg (1 large, 50g)", g: 6, kcal: 70 },
+  { label: "Baby carrots (bowl, 255g)", g: 3, kcal: 105 },
+  { label: "LesserEvil popcorn (3 cups, 28g)", g: 2, kcal: 130 },
+  { label: "Peanut butter (2 tbsp, 32g)", g: 7, kcal: 190 },
+  { label: "Cream cheese (2 tbsp, ~30g)", g: 1, kcal: 50 },
   { label: "Milano + peanut butter (18g)", g: 5, kcal: 165 }
 ].sort(byLabel);
 function chip(m) {
