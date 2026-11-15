@@ -217,7 +217,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 60; // bump on every push
+const APP_VERSION = 61; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -480,13 +480,6 @@ function setWeight(weekKey, key, val) {
   else all[weekKey][key] = val;
   save(WEIGHTS_KEY, all);
 }
-// Most recent weight logged before the given week.
-function lastWeight(weekKey, key) {
-  const all = load(WEIGHTS_KEY);
-  const weeks = Object.keys(all).filter(w => w < weekKey).sort().reverse();
-  for (const w of weeks) if (all[w][key] != null) return all[w][key];
-  return null;
-}
 
 // Older entries were one number per set: keep the last one.
 function repVal(v) { return Array.isArray(v) ? (v.filter(x => x != null).pop() ?? null) : (v ?? null); }
@@ -501,12 +494,21 @@ function setReps(weekKey, key, val) {
   else all[weekKey][key] = val;
   save(REPS_KEY, all);
 }
-// Reps from the most recent earlier week that has any.
-function lastReps(weekKey, key) {
-  const all = load(REPS_KEY);
-  const weeks = Object.keys(all).filter(w => w < weekKey).sort().reverse();
-  for (const w of weeks) if (repVal(all[w][key]) != null) return repVal(all[w][key]);
-  return null;
+// Most recent earlier session of this lift on any day: { w, r, day }.
+// Sessions sort by week, then day of the week.
+function lastLog(weekKey, dayName, name) {
+  const W = load(WEIGHTS_KEY), R = load(REPS_KEY);
+  const here = weekKey + DAYS.indexOf(dayName);
+  let best = null;
+  for (const wk of new Set([...Object.keys(W), ...Object.keys(R)])) {
+    for (const day of DAYS) {
+      const k = liftKey(day, name), at = wk + DAYS.indexOf(day);
+      if (at >= here || (best && at <= best.at)) continue;
+      const w = W[wk]?.[k] ?? null, r = repVal(R[wk]?.[k]);
+      if (w != null || r != null) best = { at, w, r, day };
+    }
+  }
+  return best;
 }
 // Top of the rep range: "8-10" -> 10, 15 -> 15, "10/leg" -> 10, "Max" -> null.
 function topReps(reps) {
@@ -687,17 +689,20 @@ function renderDay() {
     sched.exercises.forEach((ex, i) => {
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
-      const prev = lastWeight(wk, key);
       const reps = getReps(wk, key);
-      const prevReps = lastReps(wk, key);
+      const last = lastLog(wk, dayName, ex.name);
+      const prev = last?.w ?? null, prevReps = last?.r ?? null;
       const top = topReps(ex.reps);
-      const addWt = top && prevReps != null && prevReps >= top;
+      // Only say "add weight" if the last session used the same rep range.
+      const lastEx = last && SCHEDULE[last.day].exercises?.find(e => e.name === ex.name);
+      const addWt = top && prevReps != null && prevReps >= top && lastEx && topReps(lastEx.reps) === top;
+      const lastDay = last && last.day !== dayName ? ` (${DAY_SHORT[DAYS.indexOf(last.day)]})` : '';
       const pair = 'ABC'[Math.floor(i / 2)] + (i % 2 + 1);
       if (i % 2 === 0) html += `<div class="label" style="margin:${i ? 14 : 4}px 0 6px">Superset ${pair[0]}</div>`;
       html += `<div class="card"><div class="row">
         <div class="grow">
           <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}</div>
-          <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}${prevReps != null ? ` × ${prevReps}` : ''}${addWt ? ' · <span class="hit">add weight</span>' : ''}</div>
+          <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}${prevReps != null ? ` × ${prevReps}` : ''}${last ? lastDay : ''}${addWt ? ' · <span class="hit">add weight</span>' : ''}</div>
           ${ex.tip ? `<div class="sub" style="color:var(--dim)">${esc(ex.tip)}</div>` : ''}
         </div>
         <label class="wt">
