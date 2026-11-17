@@ -127,6 +127,8 @@
     .log-row .at { color: var(--dim); width: 58px; flex-shrink: 0; }
     .log-row .what { flex: 1; min-width: 0; }
     .log-row .nums { color: var(--muted); white-space: nowrap; }
+    .shuf { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 13px; line-height: 1; padding: 3px 7px; margin-left: 4px; vertical-align: 1px; }
+    .shuf.on { color: var(--orange); border-color: var(--orange); }
     .log-row button { background: none; border: none; color: var(--dim); font-size: 16px; padding: 0 4px; }
     .chip:active { border-color: var(--green); }
     .protein-edit { display: flex; gap: 6px; margin-top: 10px; }
@@ -217,7 +219,7 @@
 <div id="app"></div>
 
 <script>
-const APP_VERSION = 61; // bump on every push
+const APP_VERSION = 62; // bump on every push
 const PROTEIN_GOAL = 175;
 const CAL_GOAL = 1800; // daily limit, not a minimum
 const GOAL_WEIGHT = 160;
@@ -225,62 +227,91 @@ const CHECKIN = '2026-12-10'; // calorie check-in with Claude
 const PHOTO_START = '2026-10-23'; // first progress photos; new ones every 4 weeks
 
 // Each lifting day is 3 supersets: exercises 1+2 are A, 3+4 are B, 5+6 are C.
-// Each pair works different muscles where the split allows, so one rests
-// while the other works. Superset A is 4 sets, B and C are 3: about 13-14
-// weekly sets per major muscle (Pelland 2025).
+// Each superset stays in one area of the gym (zones), and each pair works
+// different muscles so one rests while the other works. Dumbbells are
+// carried to the station. About 14 weekly sets per major muscle (Pelland 2025).
+// alts: shuffle options for the same muscles (same sets and reps).
+const Z = { door: "Machines by the door", db: "Dumbbells + benches", cable: "Cables, far end" };
 const T = {
-  pullup: "Full hang at the bottom, chin over the bar. Under 5 reps? Use the lat pulldown.",
+  pullup: "Full hang at the bottom, chin over the bar.",
   lateral: "Light weight. Raise to shoulder height, slight bend in elbows.",
   machineRow: "Chest on the pad. Pull elbows back, squeeze shoulder blades.",
   ropeCurl: "Rope on a low pulley. Elbows pinned to your sides, curl up and pull the rope ends apart at the top. No swinging.",
   incline: "Stand between the towers, pulleys at the lowest setting, D-handles. One foot forward, lean slightly forward. Press up and in to eye level, hands meet in front. Slow on the way back.",
   rdl: "Push hips back, flat back. Stop at a strong hamstring stretch.",
   legCurl: "Squeeze hard, return slowly.",
+  legExt: "1 second squeeze at the top, return slowly.",
   calf: "Seat on the leg press, balls of feet on the bottom edge, knees straight. Let heels drop for a full stretch, push up, 1 second pause at the top.",
   crunch: "Ab crunch machine. Curl your chest down toward your hips with your abs, not your arms. 1 second squeeze, slow on the way back.",
-  ohCable: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head."
+  ohCable: "Rope on a low pulley, face away. Straighten arms overhead, elbows near your head.",
+  hyper: "45 degree bench, hip bones just above the pad. Flat back, hinge at the hips to a hamstring stretch, squeeze glutes to come up. Hold a dumbbell to your chest once the top of the range is easy.",
+  pushdown: "V-bar on the high pulley. Elbows pinned to your sides, push down until arms are straight, 1 second squeeze. Slow on the way up.",
+  fly: "Back on the pad, handles at chest height. Slight bend in elbows, bring hands together, squeeze 1s.",
+  dbCurl: "Dumbbells, palms up. Elbows at your sides, no swinging."
+};
+const A = {
+  pulldown: { name: "Lat Pulldowns", tip: "Pull the bar to your upper chest. Lean back a little." },
+  pullup: { name: "Pull-ups / Chin-ups", tip: T.pullup },
+  dbRow: { name: "Single-Arm DB Row", tip: "One knee and hand on a flat bench. Pull the dumbbell to your hip, squeeze." },
+  cableRow: { name: "Seated Cable Row", tip: "Low pulley, sit on the floor or a bench, feet braced. Pull to your stomach, squeeze shoulder blades." },
+  cableLateral: { name: "Cable Lateral Raises", tip: "Low pulley, D-handle, one arm at a time. Raise out to shoulder height." },
+  shoulderPress: { name: "Seated DB Shoulder Press", tip: "Bench upright. Press straight overhead." },
+  hammer: { name: "Hammer Curls", tip: "Dumbbells, thumbs up the whole time." },
+  dbCurl: { name: "DB Curls", tip: T.dbCurl },
+  ropeCurl: { name: "Rope Cable Curls", tip: T.ropeCurl },
+  facePull: { name: "Face Pulls", tip: "Rope on a high pulley at face height. Pull to your forehead, elbows high, pull the rope ends apart." },
+  inclineDb: { name: "Incline DB Press", tip: "Bench at 30 degrees. Lower to your upper chest, elbows about 45 degrees." },
+  cableFly: { name: "Cable Fly", tip: "Pulleys at chest height, D-handles, one step forward. Bring hands together in front, slight bend in elbows." },
+  ropePushdown: { name: "Rope Pushdowns", tip: "Rope on the high pulley. Elbows pinned, push down and pull the rope ends apart at the bottom." },
+  dbOh: { name: "DB Overhead Tricep Extension", tip: "One dumbbell in both hands overhead. Lower behind your head, elbows forward." },
+  pushdown: { name: "V-Bar Tricep Pushdowns", tip: T.pushdown },
+  goblet: { name: "Goblet Squats", tip: "Only if your knees feel fine. Dumbbell at your chest, sit down between your heels, chest up." },
+  narrowPress: { name: "Narrow Leg Press", tip: "Feet low and close together on the platform, for more quads. Do not lock knees." },
+  rdl: { name: "Dumbbell RDLs", tip: T.rdl },
+  dbCalf: { name: "Standing DB Calf Raises", tip: "Dumbbell in one hand, ball of one foot on a plate or step. Full stretch at the bottom, 1 second pause at the top." },
+  cableCrunch: { name: "Cable Crunch", tip: "Rope on a high pulley, kneel. Curl your chest toward your knees with your abs, hips still." }
 };
 const SCHEDULE = {
-  sunday: { title: "Pull", exercises: [
-    { name: "Pull-ups / Chin-ups", sets: 4, reps: "Max", tip: T.pullup },
-    { name: "Lateral Raises", sets: 4, reps: 15, tip: T.lateral },
-    { name: "Hammer-Grip Machine Row", sets: 3, reps: "8-10", tip: T.machineRow },
-    { name: "Rope Cable Curls", sets: 3, reps: "10-12", tip: T.ropeCurl },
-    { name: "Rear Delt Machine", sets: 3, reps: 15, tip: "Pec Fly/Rear Delt machine, face the pad. Handles at shoulder height, sweep arms back, squeeze 1s." },
-    { name: "Hammer Curls", sets: 3, reps: 12, tip: "Dumbbells, thumbs up the whole time." }
+  sunday: { title: "Pull", zones: [Z.door, Z.db, Z.cable], exercises: [
+    { name: "Hammer-Grip Machine Row", sets: 4, reps: "8-10", tip: T.machineRow, alts: [A.cableRow, A.dbRow] },
+    { name: "Lateral Raises", sets: 4, reps: 15, tip: T.lateral + " Bring the dumbbells to the row machine.", alts: [A.cableLateral] },
+    { name: "Pull-ups / Chin-ups", sets: 3, reps: "Max", tip: T.pullup + " Under 5 reps? Shuffle to lat pulldowns.", alts: [A.pulldown] },
+    { name: "Hammer Curls", sets: 3, reps: 12, tip: "Dumbbells, thumbs up the whole time.", alts: [A.dbCurl, A.ropeCurl] },
+    { name: "Rear Delt Machine", sets: 3, reps: 15, tip: "Pec Fly/Rear Delt machine, face the pad. Handles at shoulder height, sweep arms back, squeeze 1s.", alts: [A.facePull] },
+    { name: "Rope Cable Curls", sets: 3, reps: "10-12", tip: T.ropeCurl, alts: [A.hammer, A.dbCurl] }
   ]},
-  monday: { title: "Push", exercises: [
-    { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body." },
-    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral },
-    { name: "Standing Low-to-High Cable Press", sets: 3, reps: "10-12", tip: T.incline },
-    { name: "V-Bar Tricep Pushdowns", sets: 3, reps: "10-12", tip: "V-bar on the high pulley. Elbows pinned to your sides, push down until arms are straight, 1 second squeeze. Slow on the way up." },
-    { name: "Pec Fly Machine", sets: 3, reps: "12-15", tip: "Back on the pad, handles at chest height. Slight bend in elbows, bring hands together, squeeze 1s." },
-    { name: "DB Overhead Tricep Extension", sets: 3, reps: 12, tip: "One dumbbell in both hands overhead. Lower behind your head, elbows forward." }
+  monday: { title: "Push", zones: [Z.db, Z.cable, Z.cable], exercises: [
+    { name: "DB Flat Press", sets: 4, reps: "6-8", tip: "Lower to chest level, elbows about 45 degrees from your body.", alts: [A.inclineDb] },
+    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral, alts: [A.cableLateral] },
+    { name: "Standing Low-to-High Cable Press", sets: 3, reps: "10-12", tip: T.incline, alts: [A.cableFly, A.inclineDb] },
+    { name: "V-Bar Tricep Pushdowns", sets: 3, reps: "10-12", tip: T.pushdown, alts: [A.ropePushdown] },
+    { name: "Pec Fly Machine", sets: 3, reps: "12-15", tip: T.fly, alts: [A.cableFly] },
+    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: T.ohCable, alts: [A.dbOh] }
   ]},
-  tuesday: { title: "Legs", exercises: [
-    { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees." },
-    { name: "Leg Curls", sets: 4, reps: "10-12", tip: T.legCurl },
-    { name: "Dumbbell RDLs", sets: 3, reps: "8-10", tip: T.rdl },
-    { name: "Leg Press Calf Raises", sets: 3, reps: "12-15", tip: T.calf },
-    { name: "Leg Extensions", sets: 3, reps: "12-15", tip: "1 second squeeze at the top, return slowly." },
-    { name: "Ab Crunch Machine", sets: 3, reps: "12-15", tip: T.crunch }
+  tuesday: { title: "Legs", zones: [Z.door, Z.door, Z.cable], exercises: [
+    { name: "Leg Press", sets: 4, reps: "6-8", tip: "Heavy. Lower until knees are near 90 degrees. Do not lock knees.", alts: [A.goblet] },
+    { name: "Leg Curls", sets: 4, reps: "10-12", tip: T.legCurl, alts: [A.rdl] },
+    { name: "Leg Extensions", sets: 3, reps: "12-15", tip: T.legExt, alts: [A.narrowPress] },
+    { name: "Leg Press Calf Raises", sets: 3, reps: "12-15", tip: T.calf, alts: [A.dbCalf] },
+    { name: "Hyperextensions", sets: 3, reps: "10-12", tip: T.hyper, alts: [A.rdl] },
+    { name: "Ab Crunch Machine", sets: 3, reps: "12-15", tip: T.crunch, alts: [A.cableCrunch] }
   ]},
   wednesday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] },
-  thursday: { title: "Upper", exercises: [
-    { name: "Standing Low-to-High Cable Press", sets: 4, reps: "10-12", tip: T.incline },
-    { name: "Lat Pulldowns", sets: 4, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little." },
-    { name: "Seated DB Shoulder Press", sets: 3, reps: "8-10", tip: "Bench upright. Press straight overhead." },
-    { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: T.machineRow },
-    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: T.ohCable },
-    { name: "Rope Cable Curls", sets: 3, reps: 12, tip: T.ropeCurl }
+  thursday: { title: "Upper", zones: [Z.door, Z.door, Z.cable], exercises: [
+    { name: "Lat Pulldowns", sets: 4, reps: "8-10", tip: "Pull the bar to your upper chest. Lean back a little.", alts: [A.pullup] },
+    { name: "Lateral Raises", sets: 4, reps: "12-15", tip: T.lateral + " Bring the dumbbells to the pulldown.", alts: [A.cableLateral, A.shoulderPress] },
+    { name: "Hammer-Grip Machine Row", sets: 3, reps: "10-12", tip: T.machineRow, alts: [A.cableRow, A.dbRow] },
+    { name: "DB Curls", sets: 3, reps: "10-12", tip: T.dbCurl, alts: [A.ropeCurl, A.hammer] },
+    { name: "Standing Low-to-High Cable Press", sets: 4, reps: "10-12", tip: T.incline, alts: [A.inclineDb, A.cableFly] },
+    { name: "Overhead Cable Tricep Extension", sets: 3, reps: 12, tip: T.ohCable, alts: [A.dbOh, A.pushdown] }
   ]},
-  friday: { title: "Lower + Core", exercises: [
-    { name: "Leg Press", sets: 4, reps: "10-12", tip: "Lighter than Tuesday. Lower deep, knees past 90 degrees, slow on the way down. Do not lock knees." },
-    { name: "Ab Crunch Machine", sets: 4, reps: "12-15", tip: T.crunch },
-    { name: "Leg Extensions", sets: 3, reps: "12-15", tip: "1 second squeeze at the top, return slowly." },
-    { name: "Leg Curls", sets: 3, reps: 12, tip: T.legCurl },
-    { name: "Dumbbell RDLs", sets: 3, reps: 8, tip: T.rdl },
-    { name: "Leg Press Calf Raises", sets: 3, reps: 15, tip: T.calf }
+  friday: { title: "Lower + Core", zones: [Z.door, Z.door, Z.cable], exercises: [
+    { name: "Leg Press", sets: 4, reps: "10-12", tip: "Lighter than Tuesday. Lower deep, knees past 90 degrees, slow on the way down. Do not lock knees.", alts: [A.goblet] },
+    { name: "Leg Curls", sets: 4, reps: 12, tip: T.legCurl, alts: [A.rdl] },
+    { name: "Leg Extensions", sets: 3, reps: "12-15", tip: T.legExt, alts: [A.narrowPress] },
+    { name: "Leg Press Calf Raises", sets: 3, reps: 15, tip: T.calf, alts: [A.dbCalf] },
+    { name: "Hyperextensions", sets: 3, reps: "12-15", tip: T.hyper, alts: [A.rdl] },
+    { name: "Ab Crunch Machine", sets: 4, reps: "12-15", tip: T.crunch, alts: [A.cableCrunch] }
   ]},
   saturday: { title: "Rest", activities: ["Optional: walk, any amount helps", "7-9 hours sleep"] }
 };
@@ -337,6 +368,7 @@ const CAL_KEY = 'gym_cal_v1';
 const BODY_KEY = 'gym_body_v1';
 const FOODLOG_KEY = 'gym_foodlog_v1';
 const REPS_KEY = 'gym_reps_v1';
+const SWAP_KEY = 'gym_swap_v1'; // { "<week start>": { "<day>|<slot>": option index } }
 
 function load(key) {
   try { return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -493,6 +525,27 @@ function setReps(weekKey, key, val) {
   if (val == null) delete all[weekKey][key];
   else all[weekKey][key] = val;
   save(REPS_KEY, all);
+}
+// Shuffle: each slot is the planned lift plus its alts. A swap lasts one week.
+function slotOptions(ex) { return [ex, ...(ex.alts || []).map(a => ({ ...ex, ...a }))]; }
+function exAt(wk, day, i) {
+  const base = SCHEDULE[day].exercises[i], opts = slotOptions(base);
+  const n = ((load(SWAP_KEY)[wk] || {})[day + '|' + i] || 0) % opts.length;
+  return { ...opts[n], base, swapped: n > 0 };
+}
+function shuffleLift(wk, day, i) {
+  const all = load(SWAP_KEY), k = day + '|' + i;
+  all[wk] = all[wk] || {};
+  const n = ((all[wk][k] || 0) + 1) % slotOptions(SCHEDULE[day].exercises[i]).length;
+  if (n) all[wk][k] = n; else delete all[wk][k];
+  save(SWAP_KEY, all);
+  render();
+}
+// Rep range a lift had on a given day (planned or shuffled in).
+function repsFor(day, name) {
+  for (const ex of SCHEDULE[day].exercises || [])
+    for (const o of slotOptions(ex)) if (o.name === name) return o.reps;
+  return null;
 }
 // Most recent earlier session of this lift on any day: { w, r, day }.
 // Sessions sort by week, then day of the week.
@@ -685,8 +738,9 @@ function renderDay() {
 
   if (sched.exercises) {
     html += `<div class="section"><div class="label">Lifts · week of ${short(weekStart(d))}</div>
-      <div class="sub" style="margin:4px 0 8px">Every set: stop with 1-2 reps left, except the last set of each lift: go to failure. Superset A is 4 sets, B and C are 3.</div>`;
-    sched.exercises.forEach((ex, i) => {
+      <div class="sub" style="margin:4px 0 8px">Every set: stop with 1-2 reps left, except the last set of each lift: go to failure. Each superset stays in one area of the gym. Tap ⇄ to swap a lift for one that works the same muscles.</div>`;
+    sched.exercises.forEach((_, i) => {
+      const ex = exAt(wk, dayName, i);
       const key = liftKey(dayName, ex.name);
       const cur = getWeight(wk, key);
       const reps = getReps(wk, key);
@@ -694,14 +748,14 @@ function renderDay() {
       const prev = last?.w ?? null, prevReps = last?.r ?? null;
       const top = topReps(ex.reps);
       // Only say "add weight" if the last session used the same rep range.
-      const lastEx = last && SCHEDULE[last.day].exercises?.find(e => e.name === ex.name);
-      const addWt = top && prevReps != null && prevReps >= top && lastEx && topReps(lastEx.reps) === top;
+      const addWt = top && prevReps != null && prevReps >= top && last && topReps(repsFor(last.day, ex.name)) === top;
       const lastDay = last && last.day !== dayName ? ` (${DAY_SHORT[DAYS.indexOf(last.day)]})` : '';
       const pair = 'ABC'[Math.floor(i / 2)] + (i % 2 + 1);
-      if (i % 2 === 0) html += `<div class="label" style="margin:${i ? 14 : 4}px 0 6px">Superset ${pair[0]}</div>`;
+      if (i % 2 === 0) html += `<div class="label" style="margin:${i ? 14 : 4}px 0 6px">Superset ${pair[0]}${sched.zones ? ` · ${sched.zones[i / 2]}` : ''}</div>`;
       html += `<div class="card"><div class="row">
         <div class="grow">
-          <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}</div>
+          <div class="name"><span style="color:var(--accent)">${pair}</span> ${esc(ex.name)}${ex.alts?.length ? ` <button class="shuf${ex.swapped ? ' on' : ''}" onclick="shuffleLift('${wk}', '${dayName}', ${i})" aria-label="Swap lift">⇄</button>` : ''}</div>
+          ${ex.swapped ? `<div class="sub" style="color:var(--orange)">Instead of ${esc(ex.base.name)} this week</div>` : ''}
           <div class="sub">${ex.sets} × ${ex.reps} · ${i % 2 === 0 ? `then ${pair[0]}2 right away` : `rest 60-90s, back to ${pair[0]}1`}${prev != null ? ` · last ${prev}` : ''}${prevReps != null ? ` × ${prevReps}` : ''}${last ? lastDay : ''}${addWt ? ' · <span class="hit">add weight</span>' : ''}</div>
           ${ex.tip ? `<div class="sub" style="color:var(--dim)">${esc(ex.tip)}</div>` : ''}
         </div>
@@ -808,7 +862,7 @@ function renderWeek() {
 
     let detail = '';
     if (sched.exercises) {
-      const done = sched.exercises.filter(ex => getWeight(ymd(ws), liftKey(DAYS[i], ex.name)) != null).length;
+      const done = sched.exercises.filter((_, j) => getWeight(ymd(ws), liftKey(DAYS[i], exAt(ymd(ws), DAYS[i], j).name)) != null).length;
       detail = `${done}/${sched.exercises.length} lifts logged`;
     }
 
@@ -886,8 +940,8 @@ function renderProgress() {
     html += `<div class="card table-wrap"><table>
       <tr><th>${DAY_SHORT[DAYS.indexOf(day)]} · ${sched.title}</th>${weeks.map(w => `<th>${w.getMonth() + 1}/${w.getDate()}</th>`).join('')}</tr>`;
     sched.exercises.forEach((ex, i) => {
-      const key = liftKey(day, ex.name);
       html += `<tr><td>${esc(ex.name)}</td>${weeks.map((w, j) => {
+        const key = liftKey(day, exAt(ymd(w), day, i).name);
         const v = all[ymd(w)] && all[ymd(w)][key];
         return v != null ? `<td class="${j === 5 ? 'cur' : ''}">${v}</td>` : `<td class="empty">-</td>`;
       }).join('')}</tr>`;
